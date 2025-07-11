@@ -76,3 +76,4 @@ app.get("/api/nfl", fetchNFL);
 app.get("/api/nhl", fetchNHL);
 app.get("/api/golf", fetchGolf);
 app.get("/api/tennis", fetchTennis);
+
