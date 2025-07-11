@@ -1,0 +1,31 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "nhl": "NHL",
+    "golf": "Golf",
+    "tennis": "Tennis",
+    "nfl": "NFL"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "noData": "Aucune donnée disponible.",
+    "points": "Points",
+    "goals": "Buts",
+    "assists": "Passes",
+    "rank": "Rang",
+    "player": "Joueur",
+    "team": "Équipe",
+    "year": "Année",
+    "stats": "Statistiques",
+    "language": "Langue"
+  },
+  "charts": {
+    "topScorers": "Meilleurs marqueurs",
+    "pointsOverTime": "Points au fil du temps",
+    "goalsComparison": "Comparaison des buts"
+  },
+  "pages": {
+    "welcomeMessage": "Bienvenue sur SportPulse Analytics, votre tableau de bord pour des statistiques sportives détaillées.",
+    "selectSport": "Sélectionnez un sport dans le menu de navigation pour explorer les statistiques des joueurs."
+  }
+}
