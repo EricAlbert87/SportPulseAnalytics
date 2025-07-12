@@ -12,27 +12,20 @@ const resources = {
 };
 
 i18n
-  // Detect user language
   .use(LanguageDetector)
-  // Pass the i18n instance to react-i18next
   .use(initReactI18next)
   .init({
     resources,
-    fallbackLng: "en",          // Default language if detection fails
-    debug: false,               // Set to true for debug info in console
+    fallbackLng: "en",
+    debug: false,
     interpolation: {
-      escapeValue: false,       // React already escapes by default
+      escapeValue: false,
     },
     detection: {
-      // Order and from where user language should be detected
       order: ["querystring", "cookie", "localStorage", "navigator", "htmlTag", "path", "subdomain"],
-
-      // Cache user language on
       caches: ["localStorage", "cookie"],
-
-      // Optional expire and domain for cookie
       cookieMinutes: 10080, // 7 days
-      cookieDomain: window.location.hostname,
+      // cookieDomain: window.location.hostname, // Omit for localhost/dev compatibility
     },
   });
 

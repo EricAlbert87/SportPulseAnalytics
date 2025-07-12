@@ -15,15 +15,22 @@ function TennisPage() {
 
   // Filters
   const [nameFilter, setNameFilter] = useState("");
-  const [yearFilter, setYearFilter] = useState("");
 
   // Fetch Tennis data from backend
   useEffect(() => {
     async function fetchData() {
       try {
         const res = await axios.get("/api/tennis");
-        setPlayers(res.data);
-        setFilteredPlayers(res.data);
+        // Map backend fields to frontend fields
+        const mapped = res.data.map((p) => ({
+          rank: p.rang,
+          name: p.nom,
+          country: p.pays,
+          points: parseInt(p.points.replace(/,/g, "")) || 0,
+          tournamentsPlayed: p.tournois,
+        }));
+        setPlayers(mapped);
+        setFilteredPlayers(mapped);
       } catch (error) {
         console.error("Error loading Tennis data:", error);
       } finally {
@@ -39,16 +46,11 @@ function TennisPage() {
 
     if (nameFilter.trim() !== "") {
       filtered = filtered.filter((p) =>
-        p.name.toLowerCase().includes(nameFilter.toLowerCase())
-      );
-    }
-    if (yearFilter.trim() !== "") {
-      filtered = filtered.filter((p) =>
-        p.year.toString().includes(yearFilter)
+        (p.name || "").toLowerCase().includes(nameFilter.toLowerCase())
       );
     }
     setFilteredPlayers(filtered);
-  }, [nameFilter, yearFilter, players]);
+  }, [nameFilter, players]);
 
   // Table columns for tennis stats
   const columns = [
@@ -56,9 +58,7 @@ function TennisPage() {
     { key: "name", label: t("common.player") },
     { key: "country", label: "Country" },
     { key: "points", label: "Points" },
-    { key: "tournamentsPlayed", label: "Tournaments Played" },
-    { key: "titles", label: "Titles" },
-    { key: "year", label: t("common.year") }
+    { key: "tournamentsPlayed", label: "Tournaments Played" }
   ];
 
   return (
@@ -73,13 +73,6 @@ function TennisPage() {
           value={nameFilter}
           onChange={(e) => setNameFilter(e.target.value)}
           className="p-2 border rounded w-48"
-        />
-        <input
-          type="text"
-          placeholder="Filter by Year"
-          value={yearFilter}
-          onChange={(e) => setYearFilter(e.target.value)}
-          className="p-2 border rounded w-32"
         />
       </div>
 
@@ -97,6 +90,7 @@ function TennisPage() {
             <BarChartCustom
               title="Top 10 Tennis Players by Points"
               data={filteredPlayers
+                .slice()
                 .sort((a, b) => b.points - a.points)
                 .slice(0, 10)}
               dataKeyX="name"

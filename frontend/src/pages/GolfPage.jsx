@@ -15,15 +15,23 @@ function GolfPage() {
 
   // Filters
   const [nameFilter, setNameFilter] = useState("");
-  const [yearFilter, setYearFilter] = useState("");
 
   // Fetch Golf data from backend API
   useEffect(() => {
     async function fetchData() {
       try {
         const res = await axios.get("/api/golf");
-        setPlayers(res.data);
-        setFilteredPlayers(res.data);
+        // Map backend fields to frontend fields
+        const mapped = res.data.map((p) => ({
+          rank: p.rang,
+          name: p.nom,
+          country: p.pays,
+          fedexCupPoints: parseInt(p.points.replace(/,/g, "")) || 0,
+          eventsPlayed: p.evenements,
+          earnings: p.gains,
+        }));
+        setPlayers(mapped);
+        setFilteredPlayers(mapped);
       } catch (error) {
         console.error("Error loading Golf data:", error);
       } finally {
@@ -39,16 +47,11 @@ function GolfPage() {
 
     if (nameFilter.trim() !== "") {
       filtered = filtered.filter((p) =>
-        p.name.toLowerCase().includes(nameFilter.toLowerCase())
-      );
-    }
-    if (yearFilter.trim() !== "") {
-      filtered = filtered.filter((p) =>
-        p.year.toString().includes(yearFilter)
+        (p.name || "").toLowerCase().includes(nameFilter.toLowerCase())
       );
     }
     setFilteredPlayers(filtered);
-  }, [nameFilter, yearFilter, players]);
+  }, [nameFilter, players]);
 
   // Columns for golf stats table
   const columns = [
@@ -57,9 +60,7 @@ function GolfPage() {
     { key: "country", label: "Country" },
     { key: "fedexCupPoints", label: "FedEx Cup Points" },
     { key: "eventsPlayed", label: "Events Played" },
-    { key: "wins", label: "Wins" },
-    { key: "top10Finishes", label: "Top 10 Finishes" },
-    { key: "year", label: t("common.year") }
+    { key: "earnings", label: "Earnings" }
   ];
 
   return (
@@ -74,13 +75,6 @@ function GolfPage() {
           value={nameFilter}
           onChange={(e) => setNameFilter(e.target.value)}
           className="p-2 border rounded w-48"
-        />
-        <input
-          type="text"
-          placeholder="Filter by Year"
-          value={yearFilter}
-          onChange={(e) => setYearFilter(e.target.value)}
-          className="p-2 border rounded w-32"
         />
       </div>
 
@@ -98,6 +92,7 @@ function GolfPage() {
             <BarChartCustom
               title="Top 10 Players by FedEx Cup Points"
               data={filteredPlayers
+                .slice()
                 .sort((a, b) => b.fedexCupPoints - a.fedexCupPoints)
                 .slice(0, 10)}
               dataKeyX="name"

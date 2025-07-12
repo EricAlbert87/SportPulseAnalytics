@@ -4,14 +4,15 @@ const puppeteer = require("puppeteer");
 
 async function obtenirStatsGolf() {
   const url = "https://www.pgatour.com/fedexcup";
-
-  const browser = await puppeteer.launch({
-    headless: "new",
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-  });
-  const page = await browser.newPage();
+  let browser;
 
   try {
+    browser = await puppeteer.launch({
+      headless: "new",
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
+    const page = await browser.newPage();
+
     await page.goto(url, { waitUntil: "networkidle2" });
 
     // Attendre le tableau des joueurs
@@ -33,12 +34,14 @@ async function obtenirStatsGolf() {
       });
     });
 
-    await browser.close();
     return joueurs;
   } catch (error) {
     console.error("❌ Erreur lors du scraping des statistiques de Golf :", error);
-    await browser.close();
     throw error;
+  } finally {
+    if (browser) {
+      await browser.close();
+    }
   }
 }
 

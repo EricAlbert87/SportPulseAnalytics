@@ -2,10 +2,14 @@
 
 const puppeteer = require("puppeteer");
 
+/**
+ * Lance une instance de navigateur Puppeteer avec des options sécurisées.
+ * @returns {Promise<import('puppeteer').Browser>}
+ */
 async function lancerNavigateur() {
   try {
     const browser = await puppeteer.launch({
-      headless: "new", // Or use: true (for production headless)
+      headless: "new", // Utilisez true pour la production si besoin
       args: [
         "--no-sandbox",
         "--disable-setuid-sandbox",

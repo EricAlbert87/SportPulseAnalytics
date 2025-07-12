@@ -4,15 +4,16 @@ const puppeteer = require("puppeteer");
 
 async function obtenirStatsTennis() {
   const url = "https://www.atptour.com/en/rankings/singles";
-
-  const browser = await puppeteer.launch({
-    headless: "new",
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-  });
-
-  const page = await browser.newPage();
+  let browser;
 
   try {
+    browser = await puppeteer.launch({
+      headless: "new",
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
+
+    const page = await browser.newPage();
+
     await page.goto(url, { waitUntil: "networkidle2", timeout: 0 });
 
     // Wait for the ranking table to be loaded
@@ -33,12 +34,14 @@ async function obtenirStatsTennis() {
       });
     });
 
-    await browser.close();
     return joueurs;
   } catch (error) {
     console.error("❌ Erreur lors du scraping des statistiques de Tennis :", error);
-    await browser.close();
     throw error;
+  } finally {
+    if (browser) {
+      await browser.close();
+    }
   }
 }
 

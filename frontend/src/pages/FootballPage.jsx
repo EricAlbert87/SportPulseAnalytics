@@ -15,7 +15,6 @@ function FootballPage() {
 
   // Filters
   const [teamFilter, setTeamFilter] = useState("");
-  const [yearFilter, setYearFilter] = useState("");
   const [nameFilter, setNameFilter] = useState("");
 
   // Fetch NFL data from backend API
@@ -23,8 +22,19 @@ function FootballPage() {
     async function fetchData() {
       try {
         const res = await axios.get("/api/nfl");
-        setPlayers(res.data);
-        setFilteredPlayers(res.data);
+        // Map backend fields to frontend fields
+        const mapped = res.data.map((p) => ({
+          rank: p.rang,
+          name: p.nom,
+          team: p.equipe,
+          position: p.position,
+          gamesPlayed: p.matchs,
+          yards: p.verges,
+          touchdowns: p.tds,
+          interceptions: p.interceptions,
+        }));
+        setPlayers(mapped);
+        setFilteredPlayers(mapped);
       } catch (error) {
         console.error("Erreur lors du chargement des données NFL :", error);
       } finally {
@@ -40,21 +50,16 @@ function FootballPage() {
 
     if (teamFilter.trim() !== "") {
       filtered = filtered.filter((p) =>
-        p.team.toLowerCase().includes(teamFilter.toLowerCase())
-      );
-    }
-    if (yearFilter.trim() !== "") {
-      filtered = filtered.filter((p) =>
-        p.year.toString().includes(yearFilter)
+        (p.team || "").toLowerCase().includes(teamFilter.toLowerCase())
       );
     }
     if (nameFilter.trim() !== "") {
       filtered = filtered.filter((p) =>
-        p.name.toLowerCase().includes(nameFilter.toLowerCase())
+        (p.name || "").toLowerCase().includes(nameFilter.toLowerCase())
       );
     }
     setFilteredPlayers(filtered);
-  }, [teamFilter, yearFilter, nameFilter, players]);
+  }, [teamFilter, nameFilter, players]);
 
   // Table columns for NFL stats
   const columns = [
@@ -63,10 +68,9 @@ function FootballPage() {
     { key: "team", label: t("common.team") },
     { key: "position", label: "Position" },
     { key: "gamesPlayed", label: "Games Played" },
-    { key: "passingYards", label: "Passing Yards" },
-    { key: "rushingYards", label: "Rushing Yards" },
-    { key: "receivingYards", label: "Receiving Yards" },
+    { key: "yards", label: "Yards" },
     { key: "touchdowns", label: "Touchdowns" },
+    { key: "interceptions", label: "Interceptions" },
   ];
 
   return (
@@ -81,13 +85,6 @@ function FootballPage() {
           value={teamFilter}
           onChange={(e) => setTeamFilter(e.target.value)}
           className="p-2 border rounded w-48"
-        />
-        <input
-          type="text"
-          placeholder="Filter by Year"
-          value={yearFilter}
-          onChange={(e) => setYearFilter(e.target.value)}
-          className="p-2 border rounded w-32"
         />
         <input
           type="text"
@@ -112,7 +109,8 @@ function FootballPage() {
             <BarChartCustom
               title="Top 10 NFL Players by Touchdowns"
               data={filteredPlayers
-                .sort((a, b) => b.touchdowns - a.touchdowns)
+                .slice()
+                .sort((a, b) => (parseInt(b.touchdowns) || 0) - (parseInt(a.touchdowns) || 0))
                 .slice(0, 10)}
               dataKeyX="name"
               dataKeyY="touchdowns"

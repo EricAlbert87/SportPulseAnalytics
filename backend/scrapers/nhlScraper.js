@@ -4,15 +4,16 @@ const puppeteer = require("puppeteer");
 
 async function obtenirStatsNHL() {
   const url = "https://www.nhl.com/stats/skaters";
-
-  const browser = await puppeteer.launch({
-    headless: "new",
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-  });
-
-  const page = await browser.newPage();
+  let browser;
 
   try {
+    browser = await puppeteer.launch({
+      headless: "new",
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
+
+    const page = await browser.newPage();
+
     await page.goto(url, { waitUntil: "networkidle2", timeout: 0 });
 
     // Wait for the stats table
@@ -35,12 +36,14 @@ async function obtenirStatsNHL() {
       });
     });
 
-    await browser.close();
     return joueurs;
   } catch (error) {
     console.error("❌ Erreur lors du scraping des statistiques NHL :", error);
-    await browser.close();
     throw error;
+  } finally {
+    if (browser) {
+      await browser.close();
+    }
   }
 }
 

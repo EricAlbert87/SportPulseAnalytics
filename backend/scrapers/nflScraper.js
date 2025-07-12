@@ -4,15 +4,16 @@ const puppeteer = require("puppeteer");
 
 async function obtenirStatsNFL() {
   const url = "https://www.espn.com/nfl/stats/player";
-
-  const browser = await puppeteer.launch({
-    headless: "new",
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-  });
-
-  const page = await browser.newPage();
+  let browser;
 
   try {
+    browser = await puppeteer.launch({
+      headless: "new",
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
+
+    const page = await browser.newPage();
+
     await page.goto(url, { waitUntil: "networkidle2" });
 
     // Wait for the table to appear
@@ -36,12 +37,14 @@ async function obtenirStatsNFL() {
       });
     });
 
-    await browser.close();
     return joueurs;
   } catch (error) {
     console.error("❌ Erreur lors du scraping des statistiques NFL :", error);
-    await browser.close();
     throw error;
+  } finally {
+    if (browser) {
+      await browser.close();
+    }
   }
 }
 

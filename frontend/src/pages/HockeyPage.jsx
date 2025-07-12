@@ -16,15 +16,25 @@ function HockeyPage() {
   // Filters
   const [nameFilter, setNameFilter] = useState("");
   const [teamFilter, setTeamFilter] = useState("");
-  const [yearFilter, setYearFilter] = useState("");
 
   // Fetch NHL data
   useEffect(() => {
     async function fetchData() {
       try {
         const res = await axios.get("/api/nhl");
-        setPlayers(res.data);
-        setFilteredPlayers(res.data);
+        // Map backend fields to frontend fields
+        const mapped = res.data.map((p) => ({
+          rank: p.rang,
+          name: p.nom,
+          team: p.equipe,
+          gamesPlayed: p.matchs,
+          goals: p.buts,
+          assists: p.aides,
+          points: p.points,
+          plusMinus: p.pm,
+        }));
+        setPlayers(mapped);
+        setFilteredPlayers(mapped);
       } catch (error) {
         console.error("Error loading NHL data:", error);
       } finally {
@@ -40,22 +50,17 @@ function HockeyPage() {
 
     if (nameFilter.trim() !== "") {
       filtered = filtered.filter((p) =>
-        p.name.toLowerCase().includes(nameFilter.toLowerCase())
+        (p.name || "").toLowerCase().includes(nameFilter.toLowerCase())
       );
     }
     if (teamFilter.trim() !== "") {
       filtered = filtered.filter((p) =>
-        p.team.toLowerCase().includes(teamFilter.toLowerCase())
-      );
-    }
-    if (yearFilter.trim() !== "") {
-      filtered = filtered.filter((p) =>
-        p.year.toString().includes(yearFilter)
+        (p.team || "").toLowerCase().includes(teamFilter.toLowerCase())
       );
     }
 
     setFilteredPlayers(filtered);
-  }, [nameFilter, teamFilter, yearFilter, players]);
+  }, [nameFilter, teamFilter, players]);
 
   // NHL table columns
   const columns = [
@@ -66,7 +71,7 @@ function HockeyPage() {
     { key: "goals", label: t("common.goals") },
     { key: "assists", label: t("common.assists") },
     { key: "points", label: t("common.points") },
-    { key: "year", label: t("common.year") }
+    { key: "plusMinus", label: "+/-" }
   ];
 
   return (
@@ -89,13 +94,6 @@ function HockeyPage() {
           onChange={(e) => setTeamFilter(e.target.value)}
           className="p-2 border rounded w-48"
         />
-        <input
-          type="text"
-          placeholder="Filter by Year"
-          value={yearFilter}
-          onChange={(e) => setYearFilter(e.target.value)}
-          className="p-2 border rounded w-32"
-        />
       </div>
 
       {isLoading ? (
@@ -112,7 +110,8 @@ function HockeyPage() {
             <BarChartCustom
               title="Top 10 NHL Players by Points"
               data={filteredPlayers
-                .sort((a, b) => b.points - a.points)
+                .slice()
+                .sort((a, b) => (parseInt(b.points) || 0) - (parseInt(a.points) || 0))
                 .slice(0, 10)}
               dataKeyX="name"
               dataKeyY="points"
