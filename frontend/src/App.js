@@ -9,7 +9,7 @@ import Layout from "./components/Layout";
 
 function App() {
   return (
-    <Router basename="/sportpulse-analytics" forceRefresh={true}>
+    <Router basename="/sportpulseanalytics" forceRefresh={true}>
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<HomePage />} />
