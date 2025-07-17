@@ -48,13 +48,13 @@ function TennisPage() {
   ];
 
   return (
-    <section className="max-w-screen-xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">{t("charts.pointsOverTime")}</h1>
+    <section className="max-w-7xl mx-auto p-6 bg-white rounded-xl shadow-lg">
+      <h1 className="text-3xl font-bold text-navy-900 font-roboto mb-6">Tennis Live Stats</h1>
       <div className="flex flex-wrap gap-4 mb-6">
         <select
           value={selectedPlayer}
           onChange={(e) => setSelectedPlayer(e.target.value)}
-          className="p-2 border rounded w-48"
+          className="p-3 border border-gray-300 rounded-lg w-48 font-open-sans text-base"
         >
           <option value="">{t("common.selectPlayer")}</option>
           {players.map((p) => (

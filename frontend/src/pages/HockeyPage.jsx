@@ -62,13 +62,13 @@ function HockeyPage() {
   ];
 
   return (
-    <section className="max-w-screen-xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">{t("charts.topScorers")}</h1>
+    <section className="max-w-7xl mx-auto p-6 bg-white rounded-xl shadow-lg">
+      <h1 className="text-3xl font-bold text-navy-900 font-roboto mb-6">NHL Live Stats</h1>
       <div className="flex flex-wrap gap-4 mb-6">
         <select
           value={season}
           onChange={(e) => setSeason(e.target.value)}
-          className="p-2 border rounded w-48"
+          className="p-3 border border-gray-300 rounded-lg w-48 font-open-sans text-base"
         >
           {["2024", "2023", "2022", "2021", "2020"].map((s) => (
             <option key={s} value={s}>{t("common.selectSeason")} {s}</option>
@@ -79,14 +79,14 @@ function HockeyPage() {
           placeholder={t("common.filterByPlayer")}
           value={nameFilter}
           onChange={(e) => setNameFilter(e.target.value)}
-          className="p-2 border rounded w-48"
+          className="p-3 border border-gray-300 rounded-lg w-48 font-open-sans text-base"
         />
         <input
           type="text"
           placeholder={t("common.filterByTeam")}
           value={teamFilter}
           onChange={(e) => setTeamFilter(e.target.value)}
-          className="p-2 border rounded w-48"
+          className="p-3 border border-gray-300 rounded-lg w-48 font-open-sans text-base"
         />
       </div>
       {isLoading ? (

@@ -7,21 +7,15 @@ import { useTranslation } from "react-i18next";
 
 function GolfPage() {
   const { t } = useTranslation();
-
-  // State for golf players data
   const [players, setPlayers] = useState([]);
   const [filteredPlayers, setFilteredPlayers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  // Filters
   const [nameFilter, setNameFilter] = useState("");
 
-  // Fetch Golf data from backend API
   useEffect(() => {
     async function fetchData() {
       try {
         const res = await axios.get("/api/golf");
-        // Map backend fields to frontend fields
         const mapped = res.data.map((p) => ({
           rank: p.rang,
           name: p.nom,
@@ -41,10 +35,8 @@ function GolfPage() {
     fetchData();
   }, []);
 
-  // Filtering logic
   useEffect(() => {
     let filtered = players;
-
     if (nameFilter.trim() !== "") {
       filtered = filtered.filter((p) =>
         (p.name || "").toLowerCase().includes(nameFilter.toLowerCase())
@@ -53,7 +45,6 @@ function GolfPage() {
     setFilteredPlayers(filtered);
   }, [nameFilter, players]);
 
-  // Columns for golf stats table
   const columns = [
     { key: "rank", label: t("common.rank") },
     { key: "name", label: t("common.player") },
@@ -64,20 +55,17 @@ function GolfPage() {
   ];
 
   return (
-    <section className="max-w-screen-xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">PGA Tour Player Stats</h1>
-
-      {/* Filters */}
+    <section className="max-w-7xl mx-auto p-6 bg-white rounded-xl shadow-lg">
+      <h1 className="text-3xl font-bold text-navy-900 font-roboto mb-6">PGA Tour Live Stats</h1>
       <div className="flex flex-wrap gap-4 mb-6">
         <input
           type="text"
           placeholder="Filter by Player Name"
           value={nameFilter}
           onChange={(e) => setNameFilter(e.target.value)}
-          className="p-2 border rounded w-48"
+          className="p-3 border border-gray-300 rounded-lg w-48 font-open-sans text-base"
         />
       </div>
-
       {isLoading ? (
         <LoadingSpinner text={t("common.loading")} />
       ) : (
@@ -87,7 +75,6 @@ function GolfPage() {
             columns={columns}
             data={filteredPlayers}
           />
-
           <div className="mt-10">
             <BarChartCustom
               title="Top 10 Players by FedEx Cup Points"
@@ -97,7 +84,7 @@ function GolfPage() {
                 .slice(0, 10)}
               dataKeyX="name"
               dataKeyY="fedexCupPoints"
-              barColor="#22c55e" // Tailwind green-500 for golf
+              barColor="#22c55e"
             />
           </div>
         </>
