@@ -8,12 +8,14 @@ async function obtenirStatsGolf(maxRetries = 3) {
     try {
       browser = await puppeteer.launch({
         headless: "new",
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
+        timeout: 120000,
       });
       const page = await browser.newPage();
+      await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
 
       console.log(`Attempt ${attempt} to scrape Golf stats at ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })}`);
-      await page.goto(url, { waitUntil: "networkidle2", timeout: 120000 }); // 120-second timeout
+      await page.goto(url, { waitUntil: "networkidle2", timeout: 120000 });
       await page.waitForFunction(() => {
         const table = document.querySelector(".fedex-cup-table__table");
         return table && table.querySelectorAll("tbody tr").length > 0;
@@ -39,7 +41,7 @@ async function obtenirStatsGolf(maxRetries = 3) {
     } catch (error) {
       console.error(`❌ Attempt ${attempt} failed: ${error.message}`);
       if (attempt === maxRetries) throw error;
-      await new Promise(resolve => setTimeout(resolve, 10000 * attempt)); // 10s, 20s, 30s backoff
+      await new Promise(resolve => setTimeout(resolve, 15000 * attempt)); // 15s, 30s, 45s backoff
     } finally {
       if (browser) await browser.close();
     }
@@ -56,7 +58,7 @@ function startLiveGolfStats() {
     } catch (error) {
       console.error("❌ Failed to update Golf stats:", error.message);
     }
-  }, 60000); // Refresh every 60 seconds
+  }, 60000);
   return () => latestStats;
 }
 
