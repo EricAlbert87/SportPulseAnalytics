@@ -16,7 +16,7 @@ async function obtenirStatsTennis(maxRetries = 3) {
 
       console.log(`Attempt ${attempt} to scrape Tennis stats at ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })}`);
       await page.goto(url, { waitUntil: "networkidle2", timeout: 120000 });
-      await page.waitForSelector(".mega-table tbody tr", { timeout: 120000 }); // Changed to .mega-table, verify this
+      await page.waitForSelector(".mega-table tbody tr", { timeout: 120000 });
 
       const joueurs = await page.evaluate(() => {
         const rows = Array.from(document.querySelectorAll(".mega-table tbody tr"));
@@ -30,7 +30,7 @@ async function obtenirStatsTennis(maxRetries = 3) {
           return {
             rang: cells[0]?.innerText.trim() || "N/A",
             nom: cells[1]?.querySelector("a")?.innerText.trim() || cells[1]?.innerText.trim() || "N/A",
-            pays: cells[2]?.querySelector("img")?.alt || cells[2]?.innerText.trim() || "N/A",
+            pays: cells[2]?.querySelector("img")?.alt || "N/A",
             points: cells[3]?.innerText.trim().replace(/,/g, "") || "0",
             tournois: cells[4]?.innerText.trim() || "0",
           };
@@ -66,7 +66,6 @@ function startLiveTennisStats() {
   return () => latestStats;
 }
 
-// Export for standalone testing
 if (require.main === module) {
   (async () => {
     const stats = await obtenirStatsTennis();
