@@ -13,8 +13,11 @@ async function obtenirStatsTennis(maxRetries = 3) {
       const page = await browser.newPage();
 
       console.log(`Attempt ${attempt} to scrape Tennis stats at ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })}`);
-      await page.goto(url, { waitUntil: "networkidle2", timeout: 60000 }); // 60-second timeout
-      await page.waitForFunction(() => document.querySelector(".mega-table tbody")?.querySelectorAll("tr").length > 0, { timeout: 60000 });
+      await page.goto(url, { waitUntil: "networkidle2", timeout: 120000 }); // 120-second timeout
+      await page.waitForFunction(() => {
+        const table = document.querySelector(".mega-table tbody");
+        return table && table.querySelectorAll("tr").length > 0;
+      }, { timeout: 120000 });
 
       const joueurs = await page.evaluate(() => {
         const rows = Array.from(document.querySelectorAll(".mega-table tbody tr"));
@@ -35,7 +38,7 @@ async function obtenirStatsTennis(maxRetries = 3) {
     } catch (error) {
       console.error(`❌ Attempt ${attempt} failed: ${error.message}`);
       if (attempt === maxRetries) throw error;
-      await new Promise(resolve => setTimeout(resolve, 5000 * attempt)); // Exponential backoff
+      await new Promise(resolve => setTimeout(resolve, 10000 * attempt)); // 10s, 20s, 30s backoff
     } finally {
       if (browser) await browser.close();
     }
