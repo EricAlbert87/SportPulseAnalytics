@@ -9,20 +9,24 @@ async function obtenirStatsGolf(maxRetries = 3) {
       browser = await puppeteer.launch({
         headless: "new",
         args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
-        timeout: 120000,
+        timeout: 180000, // 180-second timeout
       });
       const page = await browser.newPage();
       await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
 
-      console.log(`Attempt ${attempt} to scrap Golf stats at ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })}`);
-      await page.goto(url, { waitUntil: "networkidle2", timeout: 120000 });
+      console.log(`Attempt ${attempt} to scrape Golf stats at ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })}`);
+      await page.goto(url, { waitUntil: "networkidle2", timeout: 180000 });
       await page.waitForFunction(() => {
-        const table = document.querySelector(".fedex-cup-table__table");
-        return table && table.querySelectorAll("tbody tr").length > 0;
-      }, { timeout: 120000 });
+        const loading = document.querySelector(".loading") || document.body.innerText.includes("loading");
+        return !loading && (document.querySelector(".fedex-cup-table__table") || document.querySelector("table"));
+      }, { timeout: 180000 });
 
-      const joueurs = await page.evaluate(() => {
-        const rows = Array.from(document.querySelectorAll(".fedex-cup-table__table tbody tr"));
+      const table = await page.$(".fedex-cup-table__table") || await page.$("table");
+      if (!table) throw new Error("No table element found");
+
+      const joueurs = await page.evaluate((tableSelector) => {
+        const table = document.querySelector(tableSelector);
+        const rows = Array.from(table.querySelectorAll("tbody tr"));
         return rows.map(row => {
           const cells = row.querySelectorAll("td");
           return {
@@ -34,7 +38,7 @@ async function obtenirStatsGolf(maxRetries = 3) {
             gains: cells[5]?.innerText.trim() || "0",
           };
         });
-      });
+      }, table ? ".fedex-cup-table__table" : "table");
 
       console.log("Successfully scraped Golf stats");
       return joueurs;
