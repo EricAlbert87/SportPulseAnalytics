@@ -16,20 +16,17 @@ async function obtenirStatsTennis(maxRetries = 3) {
 
       console.log(`Attempt ${attempt} to scrape Tennis stats at ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })}`);
       await page.goto(url, { waitUntil: "networkidle2", timeout: 120000 });
-      await page.waitForFunction(() => {
-        const table = document.querySelector(".rankings-table tbody"); // Adjusted selector
-        return table && table.querySelectorAll("tr").length > 0;
-      }, { timeout: 120000 });
+      await page.waitForSelector(".rankings-table tbody tr", { timeout: 120000 }); // Wait for rows directly
 
       const joueurs = await page.evaluate(() => {
         const rows = Array.from(document.querySelectorAll(".rankings-table tbody tr"));
         console.log(`Found ${rows.length} rows in the table`);
         const players = rows.map(row => {
           const cells = row.querySelectorAll("td");
-          if (cells.length < 6) return null; // Ensure enough columns
+          if (cells.length < 6) return null;
           return {
             rang: cells[0]?.innerText.trim() || "N/A",
-            nom: cells[1]?.querySelector(".player-cell a")?.innerText.trim() || cells[1]?.innerText.trim() || "N/A", // Target player name link
+            nom: cells[1]?.querySelector(".player-cell a")?.innerText.trim() || cells[1]?.innerText.trim() || "N/A",
             pays: cells[2]?.querySelector("img")?.alt || cells[2]?.innerText.trim() || "N/A",
             points: cells[3]?.innerText.trim().replace(/,/g, "") || "0",
             tournois: cells[4]?.innerText.trim() || "0",
