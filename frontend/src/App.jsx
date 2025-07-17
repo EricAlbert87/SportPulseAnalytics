@@ -11,8 +11,10 @@ function App() {
       <main className="p-4">
         <Dashboard />
       </main>
+      <h1>Hello, SportPulse Analytics!</h1>;
     </div>
   );
+
 }
 
 export default App;
