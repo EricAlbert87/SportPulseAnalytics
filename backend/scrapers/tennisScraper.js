@@ -23,18 +23,23 @@ async function obtenirStatsTennis(maxRetries = 3) {
 
       const joueurs = await page.evaluate(() => {
         const rows = Array.from(document.querySelectorAll(".mega-table tbody tr"));
-        return rows.map(row => {
+        console.log(`Found ${rows.length} rows in the table`); // Debug log
+        const players = rows.map(row => {
           const cells = row.querySelectorAll("td");
+          if (cells.length < 6) return null; // Skip incomplete rows
           return {
             rang: cells[0]?.innerText.trim() || "N/A",
-            nom: cells[3]?.innerText.trim() || "N/A",
-            pays: cells[4]?.querySelector("img")?.alt || "N/A",
-            points: cells[5]?.innerText.trim() || "0",
+            nom: cells[3]?.innerText.trim().split("\n")[0] || "N/A", // Take first line to avoid fragments
+            pays: cells[4]?.querySelector("img")?.alt || cells[4]?.innerText.trim() || "N/A",
+            points: cells[5]?.innerText.trim().replace(/,/g, "") || "0",
             tournois: cells[6]?.innerText.trim() || "0",
           };
-        });
+        }).filter(player => player !== null); // Remove null entries
+        console.log(`Sample player: ${players[0]?.nom} (${players[0]?.pays})`); // Debug sample
+        return players;
       });
 
+      if (joueurs.length === 0) throw new Error("No valid player data extracted");
       console.log("Successfully scraped Tennis stats");
       return joueurs;
     } catch (error) {
