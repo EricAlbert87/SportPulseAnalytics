@@ -1,26 +1,17 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import HockeyPage from "./pages/HockeyPage";
-import GolfPage from "./pages/GolfPage";
-import TennisPage from "./pages/TennisPage";
-import FootballPage from "./pages/FootballPage";
-import HomePage from "./pages/HomePage";
-import Layout from "./components/Layout";
+import { useTranslation } from 'react-i18next';
+import Header from './components/Header';
+import Dashboard from './pages/Dashboard';
 
 function App() {
+  const { t } = useTranslation();
+
   return (
-    <Router basename="/sportpulseanalytics" forceRefresh={true}>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<HomePage />} />
-          <Route path="nhl" element={<HockeyPage />} />
-          <Route path="golf" element={<GolfPage />} />
-          <Route path="tennis" element={<TennisPage />} />
-          <Route path="nfl" element={<FootballPage />} />
-          <Route path="*" element={<p className="p-6 text-center">Page Not Found</p>} />
-        </Route>
-      </Routes>
-    </Router>
+    <div className="min-h-screen bg-gray-100 text-gray-900">
+      <Header />
+      <main className="p-4">
+        <Dashboard />
+      </main>
+    </div>
   );
 }
 
