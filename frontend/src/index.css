@@ -1,3 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --navy-900: #1a2a44;
+    --gold-500: #d4a017;
+  }
+}
+
+.bg-navy-900 { background-color: #1a2a44; }
+.text-navy-900 { color: #1a2a44; }
+.hover\:text-gold-500:hover { color: #d4a017; }
+.font-roboto { font-family: 'Roboto', sans-serif; }
+.font-open-sans { font-family: 'Open Sans', sans-serif; }

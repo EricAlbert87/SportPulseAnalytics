@@ -6,15 +6,13 @@ function App() {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-900">
+    <div className="min-h-screen bg-gray-50 text-gray-800 font-roboto">
       <Header />
-      <main className="p-4">
+      <main className="max-w-7xl mx-auto p-6">
         <Dashboard />
       </main>
-      <h1>Hello, SportPulse Analytics!</h1>;
     </div>
   );
-
 }
 
 export default App;
