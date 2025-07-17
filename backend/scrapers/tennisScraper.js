@@ -16,17 +16,20 @@ async function obtenirStatsTennis(maxRetries = 3) {
 
       console.log(`Attempt ${attempt} to scrape Tennis stats at ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })}`);
       await page.goto(url, { waitUntil: "networkidle2", timeout: 120000 });
-      await page.waitForSelector(".rankings-table tbody tr", { timeout: 120000 }); // Wait for rows directly
+      await page.waitForSelector(".mega-table tbody tr", { timeout: 120000 }); // Changed to .mega-table, verify this
 
       const joueurs = await page.evaluate(() => {
-        const rows = Array.from(document.querySelectorAll(".rankings-table tbody tr"));
+        const rows = Array.from(document.querySelectorAll(".mega-table tbody tr"));
         console.log(`Found ${rows.length} rows in the table`);
         const players = rows.map(row => {
           const cells = row.querySelectorAll("td");
-          if (cells.length < 6) return null;
+          if (cells.length < 6) {
+            console.log("Skipping row with insufficient cells:", cells.length);
+            return null;
+          }
           return {
             rang: cells[0]?.innerText.trim() || "N/A",
-            nom: cells[1]?.querySelector(".player-cell a")?.innerText.trim() || cells[1]?.innerText.trim() || "N/A",
+            nom: cells[1]?.querySelector("a")?.innerText.trim() || cells[1]?.innerText.trim() || "N/A",
             pays: cells[2]?.querySelector("img")?.alt || cells[2]?.innerText.trim() || "N/A",
             points: cells[3]?.innerText.trim().replace(/,/g, "") || "0",
             tournois: cells[4]?.innerText.trim() || "0",
@@ -36,7 +39,7 @@ async function obtenirStatsTennis(maxRetries = 3) {
         return players;
       });
 
-      if (joueurs.length === 0) throw new Error("No valid player data extracted");
+      if (joueurs.length === 0) throw new Error("No valid player data extracted after processing rows");
       console.log("Successfully scraped Tennis stats");
       return joueurs;
     } catch (error) {
@@ -61,6 +64,14 @@ function startLiveTennisStats() {
     }
   }, 60000);
   return () => latestStats;
+}
+
+// Export for standalone testing
+if (require.main === module) {
+  (async () => {
+    const stats = await obtenirStatsTennis();
+    console.log("Scraped stats:", stats);
+  })();
 }
 
 module.exports = { obtenirStatsTennis, startLiveTennisStats };
