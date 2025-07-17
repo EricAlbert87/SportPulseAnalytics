@@ -1,5 +1,3 @@
-// frontend/src/api/fetchStats.js
-
 import axios from "axios";
 
 // Define your API base URL

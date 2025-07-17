@@ -1,5 +1,3 @@
-// frontend/src/components/charts/LineChartCustom.jsx
-
 import React from "react";
 import {
   LineChart,
@@ -12,10 +10,10 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-function LineChartCustom({ data, dataKeyX, dataKeyY, title, lineColor = "#22C55E" }) {
+function LineChartCustom({ data, dataKeyX, dataKeyY, title, lineColor = "#d4a017" }) {
   return (
-    <div className="bg-white dark:bg-secondary shadow-lg rounded-2xl p-4 w-full">
-      <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
+    <div className="bg-white shadow-lg rounded-xl p-6 w-full">
+      <h2 className="text-2xl font-semibold text-navy-900 font-roboto mb-5">
         {title}
       </h2>
       <ResponsiveContainer width="100%" height={400}>
@@ -23,8 +21,8 @@ function LineChartCustom({ data, dataKeyX, dataKeyY, title, lineColor = "#22C55E
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
           <XAxis dataKey={dataKeyX} tick={{ fill: "#374151" }} />
           <YAxis tick={{ fill: "#374151" }} />
-          <Tooltip contentStyle={{ backgroundColor: "#f9fafb", borderRadius: "8px" }} />
-          <Legend />
+          <Tooltip contentStyle={{ backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #e5e7eb" }} />
+          <Legend wrapperStyle={{ fontFamily: "Open Sans", fontSize: "14px" }} />
           <Line type="monotone" dataKey={dataKeyY} stroke={lineColor} strokeWidth={3} dot={{ r: 4 }} />
         </LineChart>
       </ResponsiveContainer>

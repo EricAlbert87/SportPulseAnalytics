@@ -14,10 +14,10 @@ function LoadingSpinner({ size = 8, text = "Loading..." }) {
   return (
     <div className="flex flex-col items-center justify-center py-8">
       <div
-        className={`${sizeClass} border-4 border-accent border-t-transparent rounded-full animate-spin`}
+        className={`${sizeClass} border-4 border-gold-500 border-t-transparent rounded-full animate-spin`}
         role="status"
       ></div>
-      <span className="mt-4 text-gray-600 dark:text-gray-300 text-sm">{text}</span>
+      <span className="mt-4 text-gray-600 font-open-sans text-base">{text}</span>
     </div>
   );
 }

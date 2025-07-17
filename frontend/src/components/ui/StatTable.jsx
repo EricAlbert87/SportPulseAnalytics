@@ -1,21 +1,19 @@
-// frontend/src/components/ui/StatTable.jsx
-
 import React from "react";
 
 function StatTable({ columns, data, title }) {
   return (
-    <div className="bg-white dark:bg-secondary shadow-lg rounded-2xl p-4 w-full overflow-x-auto">
+    <div className="bg-white shadow-lg rounded-xl p-6 w-full overflow-x-auto border border-gray-200">
       {title && (
-        <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
+        <h2 className="text-2xl font-semibold text-navy-900 font-roboto mb-5">
           {title}
         </h2>
       )}
 
-      <table className="min-w-full text-sm text-left text-gray-600 dark:text-gray-300">
-        <thead className="bg-gray-100 dark:bg-gray-800 text-xs uppercase tracking-wider">
+      <table className="min-w-full text-base text-left text-gray-700">
+        <thead className="bg-gray-100 text-xs uppercase tracking-wide">
           <tr>
             {columns.map((col) => (
-              <th key={col.key} className="px-4 py-3 whitespace-nowrap">
+              <th key={col.key} className="px-6 py-4 whitespace-nowrap font-open-sans">
                 {col.label}
               </th>
             ))}
@@ -24,15 +22,15 @@ function StatTable({ columns, data, title }) {
         <tbody>
           {data.length === 0 ? (
             <tr>
-              <td colSpan={columns.length} className="px-4 py-6 text-center text-gray-400">
+              <td colSpan={columns.length} className="px-6 py-8 text-center text-gray-500 font-open-sans">
                 No data available.
               </td>
             </tr>
           ) : (
             data.map((row, index) => (
-              <tr key={index} className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+              <tr key={index} className="border-b border-gray-200 hover:bg-gray-50">
                 {columns.map((col) => (
-                  <td key={col.key} className="px-4 py-2 whitespace-nowrap">
+                  <td key={col.key} className="px-6 py-4 whitespace-nowrap font-open-sans">
                     {row[col.key]}
                   </td>
                 ))}
