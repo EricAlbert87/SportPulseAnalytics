@@ -1,38 +1,32 @@
-// backend/scrapers/nflScraper.js
-
 const puppeteer = require("puppeteer");
 
 async function obtenirStatsNFL() {
-  const url = "https://www.espn.com/nfl/stats/player";
   let browser;
+  const url = "https://www.espn.com/nfl/stats/player";
 
   try {
     browser = await puppeteer.launch({
       headless: "new",
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
-
     const page = await browser.newPage();
 
     await page.goto(url, { waitUntil: "networkidle2" });
-
-    // Wait for the table to appear
-    await page.waitForSelector("table tbody");
+    await page.waitForFunction(() => document.querySelector("table tbody")?.querySelectorAll("tr").length > 0);
 
     const joueurs = await page.evaluate(() => {
       const rows = Array.from(document.querySelectorAll("table tbody tr"));
-
       return rows.map(row => {
         const cells = row.querySelectorAll("td");
         return {
-          rang: cells[0]?.innerText.trim(),                  // Rank
-          nom: cells[1]?.innerText.trim(),                   // Player name
-          equipe: cells[2]?.innerText.trim(),                // Team abbreviation
-          position: cells[3]?.innerText.trim(),              // Position
-          matchs: cells[4]?.innerText.trim(),                // Games played
-          verges: cells[5]?.innerText.trim(),                // Yards (passing, rushing, etc.)
-          tds: cells[6]?.innerText.trim(),                   // Touchdowns
-          interceptions: cells[7]?.innerText.trim() || "-"   // Interceptions (if available)
+          rang: cells[0]?.innerText.trim() || "N/A",
+          nom: cells[1]?.innerText.trim() || "N/A",
+          equipe: cells[2]?.innerText.trim() || "N/A",
+          position: cells[3]?.innerText.trim() || "N/A",
+          matchs: cells[4]?.innerText.trim() || "0",
+          verges: cells[5]?.innerText.trim() || "0",
+          tds: cells[6]?.innerText.trim() || "0",
+          interceptions: cells[7]?.innerText.trim() || "-",
         };
       });
     });
@@ -40,12 +34,20 @@ async function obtenirStatsNFL() {
     return joueurs;
   } catch (error) {
     console.error("❌ Erreur lors du scraping des statistiques NFL :", error);
-    throw error;
+    return [];
   } finally {
-    if (browser) {
-      await browser.close();
-    }
+    if (browser) await browser.close();
   }
 }
 
-module.exports = obtenirStatsNFL;
+function startLiveNFLStats() {
+  let latestStats = [];
+  setInterval(async () => {
+    const stats = await obtenirStatsNFL();
+    if (stats.length > 0) latestStats = stats;
+    console.log("NFL stats updated at", new Date().toLocaleString("en-US", { timeZone: "America/New_York" }));
+  }, 60000); // Refresh every 60 seconds
+  return () => latestStats;
+}
+
+module.exports = { obtenirStatsNFL, startLiveNFLStats };

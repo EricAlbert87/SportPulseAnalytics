@@ -1,28 +1,37 @@
-const express = require("express");
-const cors = require("cors");
+// backend/server.js
+const express = require('express');
+const { obtenirStatsGolf, startLiveGolfStats } = require('./scrapers/golfScraper');
+const { obtenirStatsNHL, startLiveNHLStats } = require('./scrapers/nhlScraper');
+const { obtenirStatsNFL, startLiveNFLStats } = require('./scrapers/nflScraper');
+const { obtenirStatsTennis, startLiveTennisStats } = require('./scrapers/tennisScraper');
+
 const app = express();
-const PORT = process.env.PORT || 3001;
+const port = 3001;
 
-const {
-  fetchNFL,
-  fetchNHL,
-  fetchGolf,
-  fetchTennis,
-} = require("./controllers/apiController");
+const liveGolfStats = startLiveGolfStats();
+const liveNHLStats = startLiveNHLStats();
+const liveNFLStats = startLiveNFLStats();
+const liveTennisStats = startLiveTennisStats();
 
-app.use(cors());
 app.use(express.json());
 
-app.get("", (req, res) => {
-  res.send("🏈🏒⛳🎾 Bienvenue à l'API Analytiques SportPulse!");
+// API endpoints
+app.get('/api/golf', (req, res) => {
+  res.json(liveGolfStats());
 });
 
-// Utilise les contrôleurs centralisés pour chaque sport
-app.get("/api/nfl", fetchNFL);
-app.get("/api/nhl", fetchNHL);
-app.get("/api/golf", fetchGolf);
-app.get("/api/tennis", fetchTennis);
+app.get('/api/nhl', (req, res) => {
+  res.json(liveNHLStats());
+});
 
-app.listen(PORT, () => {
-  console.log(`✅ Serveur en marche à l'adresse : http://localhost:${PORT}`);
+app.get('/api/nfl', (req, res) => {
+  res.json(liveNFLStats());
+});
+
+app.get('/api/tennis', (req, res) => {
+  res.json(liveTennisStats());
+});
+
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
 });

@@ -1,10 +1,8 @@
-// backend/scrapers/golfScraper.js
-
 const puppeteer = require("puppeteer");
 
 async function obtenirStatsGolf() {
-  const url = "https://www.pgatour.com/fedexcup";
   let browser;
+  const url = "https://www.pgatour.com/fedexcup";
 
   try {
     browser = await puppeteer.launch({
@@ -14,22 +12,19 @@ async function obtenirStatsGolf() {
     const page = await browser.newPage();
 
     await page.goto(url, { waitUntil: "networkidle2" });
-
-    // Attendre le tableau des joueurs
-    await page.waitForSelector(".fedex-cup-table__table");
+    await page.waitForFunction(() => document.querySelector(".fedex-cup-table__table")?.querySelectorAll("tbody tr").length > 0);
 
     const joueurs = await page.evaluate(() => {
-      const rows = Array.from(document.querySelectorAll("table.fedex-cup-table__table tbody tr"));
-
+      const rows = Array.from(document.querySelectorAll(".fedex-cup-table__table tbody tr"));
       return rows.map(row => {
         const cells = row.querySelectorAll("td");
         return {
-          rang: cells[0]?.innerText.trim(),
-          nom: cells[1]?.innerText.trim(),
-          pays: cells[2]?.innerText.trim(),
-          points: cells[3]?.innerText.trim(),
-          evenements: cells[4]?.innerText.trim(),
-          gains: cells[5]?.innerText.trim(),
+          rang: cells[0]?.innerText.trim() || "N/A",
+          nom: cells[1]?.innerText.trim() || "N/A",
+          pays: cells[2]?.innerText.trim() || "N/A",
+          points: cells[3]?.innerText.trim() || "0",
+          evenements: cells[4]?.innerText.trim() || "0",
+          gains: cells[5]?.innerText.trim() || "0",
         };
       });
     });
@@ -37,12 +32,20 @@ async function obtenirStatsGolf() {
     return joueurs;
   } catch (error) {
     console.error("❌ Erreur lors du scraping des statistiques de Golf :", error);
-    throw error;
+    return [];
   } finally {
-    if (browser) {
-      await browser.close();
-    }
+    if (browser) await browser.close();
   }
 }
 
-module.exports = obtenirStatsGolf;
+function startLiveGolfStats() {
+  let latestStats = [];
+  setInterval(async () => {
+    const stats = await obtenirStatsGolf();
+    if (stats.length > 0) latestStats = stats;
+    console.log("Golf stats updated at", new Date().toLocaleString("en-US", { timeZone: "America/New_York" }));
+  }, 60000); // Refresh every 60 seconds
+  return () => latestStats;
+}
+
+module.exports = { obtenirStatsGolf, startLiveGolfStats };
