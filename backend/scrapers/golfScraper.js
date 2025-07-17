@@ -14,7 +14,7 @@ async function obtenirStatsGolf(maxRetries = 3) {
       const page = await browser.newPage();
       await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
 
-      console.log(`Attempt ${attempt} to scrape Golf stats at ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })}`);
+      console.log(`Attempt ${attempt} to scrap Golf stats at ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })}`);
       await page.goto(url, { waitUntil: "networkidle2", timeout: 120000 });
       await page.waitForFunction(() => {
         const table = document.querySelector(".fedex-cup-table__table");
