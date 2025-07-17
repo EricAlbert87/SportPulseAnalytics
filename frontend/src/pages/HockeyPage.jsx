@@ -9,7 +9,7 @@ function HockeyPage() {
   const { t } = useTranslation();
   const [players, setPlayers] = useState([]);
   const [filteredPlayers, setFilteredPlayers] = useState([]);
-  const [season, setSeason] = useState("2024");
+  const [season, setSeason] = useState("2025");
   const [nameFilter, setNameFilter] = useState("");
   const [teamFilter, setTeamFilter] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -62,15 +62,15 @@ function HockeyPage() {
   ];
 
   return (
-    <section className="max-w-7xl mx-auto p-6 bg-white rounded-xl shadow-lg">
-      <h1 className="text-3xl font-bold text-navy-900 font-roboto mb-6">NHL Live Stats</h1>
-      <div className="flex flex-wrap gap-4 mb-6">
+    <section className="max-w-7xl mx-auto p-8 bg-white rounded-xl shadow-2xl">
+      <h1 className="text-4xl font-bold text-navy-900 font-roboto mb-8">NHL Live Statistics</h1>
+      <div className="flex flex-wrap gap-6 mb-8">
         <select
           value={season}
           onChange={(e) => setSeason(e.target.value)}
-          className="p-3 border border-gray-300 rounded-lg w-48 font-open-sans text-base"
+          className="p-4 border border-gray-300 rounded-lg w-56 font-open-sans text-lg bg-white text-gray-800"
         >
-          {["2024", "2023", "2022", "2021", "2020"].map((s) => (
+          {["2025", "2024", "2023", "2022", "2021"].map((s) => (
             <option key={s} value={s}>{t("common.selectSeason")} {s}</option>
           ))}
         </select>
@@ -79,14 +79,14 @@ function HockeyPage() {
           placeholder={t("common.filterByPlayer")}
           value={nameFilter}
           onChange={(e) => setNameFilter(e.target.value)}
-          className="p-3 border border-gray-300 rounded-lg w-48 font-open-sans text-base"
+          className="p-4 border border-gray-300 rounded-lg w-56 font-open-sans text-lg bg-white text-gray-800"
         />
         <input
           type="text"
           placeholder={t("common.filterByTeam")}
           value={teamFilter}
           onChange={(e) => setTeamFilter(e.target.value)}
-          className="p-3 border border-gray-300 rounded-lg w-48 font-open-sans text-base"
+          className="p-4 border border-gray-300 rounded-lg w-56 font-open-sans text-lg bg-white text-gray-800"
         />
       </div>
       {isLoading ? (
@@ -94,7 +94,7 @@ function HockeyPage() {
       ) : (
         <>
           <StatTable title={t("common.stats")} columns={columns} data={filteredPlayers} />
-          <div className="mt-10">
+          <div className="mt-12">
             <BarChartCustom
               title={t("charts.topScorers")}
               data={filteredPlayers

@@ -48,13 +48,13 @@ function TennisPage() {
   ];
 
   return (
-    <section className="max-w-7xl mx-auto p-6 bg-white rounded-xl shadow-lg">
-      <h1 className="text-3xl font-bold text-navy-900 font-roboto mb-6">Tennis Live Stats</h1>
-      <div className="flex flex-wrap gap-4 mb-6">
+    <section className="max-w-7xl mx-auto p-8 bg-white rounded-xl shadow-2xl">
+      <h1 className="text-4xl font-bold text-navy-900 font-roboto mb-8">Tennis Live Statistics</h1>
+      <div className="flex flex-wrap gap-6 mb-8">
         <select
           value={selectedPlayer}
           onChange={(e) => setSelectedPlayer(e.target.value)}
-          className="p-3 border border-gray-300 rounded-lg w-48 font-open-sans text-base"
+          className="p-4 border border-gray-300 rounded-lg w-56 font-open-sans text-lg bg-white text-gray-800"
         >
           <option value="">{t("common.selectPlayer")}</option>
           {players.map((p) => (
@@ -68,7 +68,7 @@ function TennisPage() {
         <>
           <StatTable title={t("common.stats")} columns={columns} data={filteredPlayers} />
           {selectedPlayer && (
-            <div className="mt-10">
+            <div className="mt-12">
               <LineChartCustom
                 title={`${t("charts.pointsOverTime")} - ${selectedPlayer}`}
                 data={chartData}

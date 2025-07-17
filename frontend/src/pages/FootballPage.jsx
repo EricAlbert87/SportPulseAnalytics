@@ -65,22 +65,22 @@ function FootballPage() {
   ];
 
   return (
-    <section className="max-w-7xl mx-auto p-6 bg-white rounded-xl shadow-lg">
-      <h1 className="text-3xl font-bold text-navy-900 font-roboto mb-6">NFL Live Stats</h1>
-      <div className="flex flex-wrap gap-4 mb-6">
+    <section className="max-w-7xl mx-auto p-8 bg-white rounded-xl shadow-2xl">
+      <h1 className="text-4xl font-bold text-navy-900 font-roboto mb-8">NFL Live Statistics</h1>
+      <div className="flex flex-wrap gap-6 mb-8">
         <input
           type="text"
           placeholder="Filter by Team"
           value={teamFilter}
           onChange={(e) => setTeamFilter(e.target.value)}
-          className="p-3 border border-gray-300 rounded-lg w-48 font-open-sans text-base"
+          className="p-4 border border-gray-300 rounded-lg w-56 font-open-sans text-lg bg-white text-gray-800"
         />
         <input
           type="text"
           placeholder="Filter by Player Name"
           value={nameFilter}
           onChange={(e) => setNameFilter(e.target.value)}
-          className="p-3 border border-gray-300 rounded-lg w-48 font-open-sans text-base"
+          className="p-4 border border-gray-300 rounded-lg w-56 font-open-sans text-lg bg-white text-gray-800"
         />
       </div>
       {isLoading ? (
@@ -92,7 +92,7 @@ function FootballPage() {
             columns={columns}
             data={filteredPlayers}
           />
-          <div className="mt-10">
+          <div className="mt-12">
             <BarChartCustom
               title="Top 10 NFL Players by Touchdowns"
               data={filteredPlayers
