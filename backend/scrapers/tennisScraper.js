@@ -2,7 +2,7 @@ const puppeteer = require("puppeteer");
 
 async function obtenirStatsTennis(maxRetries = 3) {
   let browser;
-  const url = "https://www.atptour.com/en/rankings/singles";
+  const url = "https://live-tennis.eu/en/atp-live-ranking";
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
