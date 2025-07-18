@@ -9,20 +9,18 @@ async function obtenirStatsGolf(maxRetries = 3) {
       browser = await puppeteer.launch({
         headless: "new",
         args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
-        timeout: 300000, // 5 minutes
-        protocolTimeout: 600000, // 10 minutes
+        timeout: 60000, // 1 minute for faster initial load
       });
       const page = await browser.newPage();
       await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
       await page.setViewport({ width: 1280, height: 800 });
 
       console.log(`Attempt ${attempt} to scrape Golf stats at ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })}`);
-      await page.goto(url, { waitUntil: "load", timeout: 300000 });
-      await page.waitForFunction(() => document.querySelector(".fedex-standings-table") !== null, { timeout: 300000 });
-      await page.waitForSelector(".fedex-standings-table tbody tr", { timeout: 300000 });
+      await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60000 });
+      await page.waitForSelector(".table-standings tbody tr", { timeout: 60000 }); // Updated selector based on common PGA structure
 
       const data = await page.evaluate(() => {
-        const rows = Array.from(document.querySelectorAll(".fedex-standings-table tbody tr"));
+        const rows = Array.from(document.querySelectorAll(".table-standings tbody tr"));
         console.log(`Found ${rows.length} rows in the table`);
         const players = rows.map(row => {
           const cells = row.querySelectorAll("td");
@@ -36,7 +34,6 @@ async function obtenirStatsGolf(maxRetries = 3) {
             gains: cells[5]?.innerText.trim().replace(/,/g, "") || "0",
           };
         }).filter(player => player !== null && player.rang !== "N/A" && !isNaN(player.rang));
-        console.log(`Sample player: ${players[0]?.nom} (${players[0]?.pays})`);
         return players;
       });
 
@@ -46,7 +43,7 @@ async function obtenirStatsGolf(maxRetries = 3) {
     } catch (error) {
       console.error(`❌ Attempt ${attempt} failed: ${error.message}`);
       if (attempt === maxRetries) throw error;
-      await new Promise(resolve => setTimeout(resolve, 15000 * attempt));
+      await new Promise(resolve => setTimeout(resolve, 10000 * attempt)); // Reduced retry delay
     } finally {
       if (browser) await browser.close();
     }
