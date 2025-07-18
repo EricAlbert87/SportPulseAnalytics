@@ -2,34 +2,27 @@ const puppeteer = require("puppeteer");
 
 async function obtenirStatsGolf(maxRetries = 3) {
   let browser;
-  const url = "https://www.tsn.ca/golf/pga-tour/fedex-cup-standings";
+  const url = "https://www.pgatour.com/fedexcup/standings";
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       browser = await puppeteer.launch({
         headless: "new",
-        args: [
-          "--no-sandbox",
-          "--disable-setuid-sandbox",
-          "--disable-dev-shm-usage",
-          "--disable-blink-features=AutomationControlled",
-        ],
-        executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", // Adjust to your path
-        timeout: 300000, // 5 minutes
-        protocolTimeout: 240000, // 4 minutes
+        args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
+        timeout: 120000, // 2 minutes
       });
       const page = await browser.newPage();
       await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
       await page.setViewport({ width: 1280, height: 800 });
 
       console.log(`Attempt ${attempt} to scrape Golf stats at ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })}`);
-      await page.goto(url, { waitUntil: "load", timeout: 300000 });
-      await new Promise(resolve => setTimeout(resolve, 15000)); // Increased delay
-      await page.click('#onetrust-accept-btn-handler', { timeout: 15000 }).catch(() => {}); // Accept cookies
-      await page.waitForSelector(".standings-table tbody tr", { timeout: 300000 }); // Adjusted selector
+      await page.goto(url, { waitUntil: "domcontentloaded", timeout: 120000 });
+      await new Promise(resolve => setTimeout(resolve, 5000)); // Delay for dynamic content
+      await page.click('#cookie-accept', { timeout: 5000 }).catch(() => {}); // Accept cookies if present
+      await page.waitForSelector(".table-responsive tbody tr", { timeout: 120000 });
 
       const data = await page.evaluate(() => {
-        const rows = Array.from(document.querySelectorAll(".standings-table tbody tr"));
+        const rows = Array.from(document.querySelectorAll(".table-responsive tbody tr"));
         console.log(`Found ${rows.length} rows in the table`);
         const players = rows.map(row => {
           const cells = row.querySelectorAll("td");
@@ -52,7 +45,7 @@ async function obtenirStatsGolf(maxRetries = 3) {
     } catch (error) {
       console.error(`❌ Attempt ${attempt} failed: ${error.message}`);
       if (attempt === maxRetries) throw error;
-      await new Promise(resolve => setTimeout(resolve, 20000 * attempt));
+      await new Promise(resolve => setTimeout(resolve, 10000 * attempt));
     } finally {
       if (browser) await browser.close();
     }
