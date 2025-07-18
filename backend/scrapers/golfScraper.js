@@ -8,25 +8,36 @@ async function obtenirStatsGolf(maxRetries = 3) {
     try {
       browser = await puppeteer.launch({
         headless: "new",
-        args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
-        timeout: 180000, // 3 minutes
+        args: [
+          "--no-sandbox",
+          "--disable-setuid-sandbox",
+          "--disable-dev-shm-usage"
+        ],
+        timeout: 180000,
       });
       const page = await browser.newPage();
-      await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
+      await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
       await page.setViewport({ width: 1280, height: 800 });
 
       console.log(`Attempt ${attempt} to scrape Golf stats at ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })}`);
-      await page.goto(url, { waitUntil: "load", timeout: 180000 });
-      await new Promise(resolve => setTimeout(resolve, 10000)); // Increased delay
-      await page.click('#cookie-accept', { timeout: 10000 }).catch(() => {}); // Accept cookies
-      await page.waitForSelector(".standings-table tbody tr", { timeout: 180000 }); // Adjusted selector
+      await page.goto(url, { waitUntil: "domcontentloaded", timeout: 180000 });
 
-      const data = await page.evaluate(() => {
+      // Accept cookies if exists
+      await page.click('#cookie-accept', { timeout: 5000 }).catch(() => {});
+
+      // Wait for iframe to load
+      await page.waitForSelector("iframe", { timeout: 30000 });
+      const iframeElement = await page.$("iframe");
+      const frame = await iframeElement.contentFrame();
+
+      // Wait for standings inside the iframe
+      await frame.waitForSelector(".standings-table tbody tr", { timeout: 60000 });
+
+      const data = await frame.evaluate(() => {
         const rows = Array.from(document.querySelectorAll(".standings-table tbody tr"));
-        console.log(`Found ${rows.length} rows in the table`);
-        const players = rows.map(row => {
+        return rows.map(row => {
           const cells = row.querySelectorAll("td");
-          if (cells.length < 6 || !cells[1]?.innerText.trim()) return null;
+          if (cells.length < 6) return null;
           return {
             rang: cells[0]?.innerText.trim() || "N/A",
             nom: cells[1]?.innerText.trim() || "N/A",
@@ -35,12 +46,10 @@ async function obtenirStatsGolf(maxRetries = 3) {
             points: cells[4]?.innerText.trim().replace(/,/g, "") || "0",
             gains: cells[5]?.innerText.trim().replace(/,/g, "") || "0",
           };
-        }).filter(player => player !== null && player.rang !== "N/A" && !isNaN(player.rang));
-        return players;
+        }).filter(p => p && !isNaN(p.rang));
       });
 
-      if (data.length === 0) throw new Error("No valid player data extracted after processing rows");
-      console.log("Successfully scraped Golf stats");
+      console.log("✅ Successfully scraped Golf stats");
       return data;
     } catch (error) {
       console.error(`❌ Attempt ${attempt} failed: ${error.message}`);
@@ -58,7 +67,7 @@ function startLiveGolfStats() {
     try {
       const stats = await obtenirStatsGolf();
       if (stats.length > 0) latestStats = stats;
-      console.log("Golf stats updated at", new Date().toLocaleString("en-US", { timeZone: "America/New_York" }));
+      console.log("✅ Golf stats updated at", new Date().toLocaleString("en-US", { timeZone: "America/New_York" }));
     } catch (error) {
       console.error("❌ Failed to update Golf stats:", error.message);
     }
