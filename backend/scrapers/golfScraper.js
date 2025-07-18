@@ -17,7 +17,7 @@ async function obtenirStatsGolf(maxRetries = 3) {
 
       console.log(`Attempt ${attempt} to scrape Golf stats at ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })}`);
       await page.goto(url, { waitUntil: "domcontentloaded", timeout: 120000 });
-      await page.waitForTimeout(5000); // Corrected delay
+      await new Promise(resolve => setTimeout(resolve, 5000)); // Alternative delay method
       await page.waitForSelector(".table-responsive tbody tr", { timeout: 120000 });
 
       const data = await page.evaluate(() => {
