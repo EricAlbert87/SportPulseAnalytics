@@ -9,21 +9,23 @@ async function obtenirStatsGolf(maxRetries = 3) {
       browser = await puppeteer.launch({
         headless: "new",
         args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
-        timeout: 120000,
+        timeout: 180000, // Increase to 3 minutes
       });
       const page = await browser.newPage();
       await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
+      await page.setViewport({ width: 1280, height: 800 }); // Ensure proper rendering
 
       console.log(`Attempt ${attempt} to scrape Golf stats at ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })}`);
-      await page.goto(url, { waitUntil: "networkidle2", timeout: 120000 });
-      await page.waitForSelector(".rankings-table tbody tr", { timeout: 120000 }); // Verify selector
+      await page.goto(url, { waitUntil: "domcontentloaded", timeout: 180000 }); // Wait for DOM
+      await page.waitForFunction(() => document.querySelector(".rankings-table") !== null, { timeout: 180000 }); // Wait for table
+      await page.waitForSelector(".rankings-table tbody tr", { timeout: 180000 }); // Verify selector
 
       const data = await page.evaluate(() => {
         const rows = Array.from(document.querySelectorAll(".rankings-table tbody tr"));
         console.log(`Found ${rows.length} rows in the table`);
         const players = rows.map(row => {
           const cells = row.querySelectorAll("td");
-          if (cells.length < 6 || !cells[1]?.innerText.trim()) return null; // Filter empty or header rows
+          if (cells.length < 6 || !cells[1]?.innerText.trim()) return null;
           return {
             rang: cells[0]?.innerText.trim() || "N/A",
             nom: cells[1]?.innerText.trim() || "N/A",
