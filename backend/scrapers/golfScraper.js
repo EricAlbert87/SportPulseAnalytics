@@ -17,8 +17,8 @@ async function obtenirStatsGolf(maxRetries = 3) {
 
       console.log(`Attempt ${attempt} to scrape Golf stats at ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })}`);
       await page.goto(url, { waitUntil: "domcontentloaded", timeout: 120000 });
-      await page.waitForTimeout(5000); // Allow time for dynamic content
-      await page.waitForSelector(".table-responsive tbody tr", { timeout: 120000 }); // Updated selector
+      await page.waitForTimeout(5000); // Correct delay syntax
+      await page.waitForSelector(".table-responsive tbody tr", { timeout: 120000 });
 
       const data = await page.evaluate(() => {
         const rows = Array.from(document.querySelectorAll(".table-responsive tbody tr"));
