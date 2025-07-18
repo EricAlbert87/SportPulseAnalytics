@@ -9,16 +9,17 @@ async function obtenirStatsGolf(maxRetries = 3) {
       browser = await puppeteer.launch({
         headless: "new",
         args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
-        timeout: 240000, // Increase to 4 minutes
+        timeout: 300000, // 5 minutes
+        protocolTimeout: 600000, // 10 minutes
       });
       const page = await browser.newPage();
       await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
       await page.setViewport({ width: 1280, height: 800 });
 
       console.log(`Attempt ${attempt} to scrape Golf stats at ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })}`);
-      await page.goto(url, { waitUntil: "load", timeout: 240000 });
-      await page.waitForFunction(() => document.querySelector(".fedex-standings-table") !== null, { timeout: 240000 }); // Test new selector
-      await page.waitForSelector(".fedex-standings-table tbody tr", { timeout: 240000 });
+      await page.goto(url, { waitUntil: "load", timeout: 300000 });
+      await page.waitForFunction(() => document.querySelector(".fedex-standings-table") !== null, { timeout: 300000 });
+      await page.waitForSelector(".fedex-standings-table tbody tr", { timeout: 300000 });
 
       const data = await page.evaluate(() => {
         const rows = Array.from(document.querySelectorAll(".fedex-standings-table tbody tr"));
