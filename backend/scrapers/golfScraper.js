@@ -2,7 +2,7 @@ const puppeteer = require("puppeteer");
 
 async function obtenirStatsGolf(maxRetries = 3) {
   let browser;
-  const url = "https://www.pgatour.com/fedexcup/standings";
+  const url = "https://www.tsn.ca/golf/pga-tour/fedex-cup-standings";
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
@@ -18,10 +18,11 @@ async function obtenirStatsGolf(maxRetries = 3) {
       console.log(`Attempt ${attempt} to scrape Golf stats at ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })}`);
       await page.goto(url, { waitUntil: "domcontentloaded", timeout: 180000 });
       await new Promise(resolve => setTimeout(resolve, 5000)); // Delay for dynamic content
-      await page.waitForSelector(".standings-table tbody tr", { timeout: 180000 }); // Updated selector
+      await page.click('#onetrust-accept-btn-handler', { timeout: 5000 }).catch(() => {}); // Accept cookies if present
+      await page.waitForSelector(".c-scoreboard__table tbody tr", { timeout: 180000 }); // Initial generic selector
 
       const data = await page.evaluate(() => {
-        const rows = Array.from(document.querySelectorAll(".standings-table tbody tr"));
+        const rows = Array.from(document.querySelectorAll(".c-scoreboard__table tbody tr"));
         console.log(`Found ${rows.length} rows in the table`);
         const players = rows.map(row => {
           const cells = row.querySelectorAll("td");
