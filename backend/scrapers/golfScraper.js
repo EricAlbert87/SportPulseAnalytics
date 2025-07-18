@@ -14,7 +14,7 @@ async function obtenirStatsGolf(maxRetries = 3) {
           "--disable-dev-shm-usage",
           "--disable-blink-features=AutomationControlled",
         ],
-        executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", // Adjust to your path
+        executablePath: "/opt/homebrew/bin/chromium", // Update to the path from `which chromium`
         timeout: 300000, // 5 minutes
         protocolTimeout: 240000, // 4 minutes
       });
