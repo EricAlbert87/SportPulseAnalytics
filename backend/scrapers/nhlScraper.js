@@ -2,7 +2,7 @@ const puppeteer = require("puppeteer");
 
 async function obtenirStatsNHL(maxRetries = 3) {
   let browser;
-  const url = "https://www.nhl.com/stats/players"; // Verify this URL
+  const url = "https://www.nhl.com/stats/skaters";
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
@@ -16,14 +16,15 @@ async function obtenirStatsNHL(maxRetries = 3) {
 
       console.log(`Attempt ${attempt} to scrape NHL stats at ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })}`);
       await page.goto(url, { waitUntil: "networkidle2", timeout: 120000 });
-      await page.waitForSelector(".stats-table tbody tr", { timeout: 120000 }); // Verify selector
+      await page.click('#cookie-accept', { timeout: 10000 }).catch(() => {});
+      await page.waitForSelector(".stats-table tbody tr", { timeout: 120000 });
 
-      const data = await page.evaluate(() => {
+      const joueurs = await page.evaluate(() => {
         const rows = Array.from(document.querySelectorAll(".stats-table tbody tr"));
         console.log(`Found ${rows.length} rows in the table`);
         const players = rows.map(row => {
           const cells = row.querySelectorAll("td");
-          if (cells.length < 8) {
+          if (cells.length < 6) {
             console.log("Skipping row with insufficient cells:", cells.length);
             return null;
           }
@@ -31,20 +32,18 @@ async function obtenirStatsNHL(maxRetries = 3) {
             rang: cells[0]?.innerText.trim() || "N/A",
             nom: cells[1]?.innerText.trim() || "N/A",
             equipe: cells[2]?.innerText.trim() || "N/A",
-            matchs: cells[3]?.innerText.trim() || "0",
-            buts: cells[4]?.innerText.trim() || "0",
-            aides: cells[5]?.innerText.trim() || "0",
-            points: cells[6]?.innerText.trim().replace(/,/g, "") || "0",
-            pm: cells[7]?.innerText.trim() || "0",
+            points: cells[3]?.innerText.trim().replace(/,/g, "") || "0",
+            matchs: cells[4]?.innerText.trim() || "0",
+            buts: cells[5]?.innerText.trim() || "0",
           };
         }).filter(player => player !== null);
         console.log(`Sample player: ${players[0]?.nom} (${players[0]?.equipe})`);
         return players;
       });
 
-      if (data.length === 0) throw new Error("No valid player data extracted after processing rows");
+      if (joueurs.length === 0) throw new Error("No valid player data extracted after processing rows");
       console.log("Successfully scraped NHL stats");
-      return data;
+      return joueurs;
     } catch (error) {
       console.error(`❌ Attempt ${attempt} failed: ${error.message}`);
       if (attempt === maxRetries) throw error;
