@@ -10,6 +10,7 @@ async function obtenirStatsGolf(maxRetries = 3) {
         headless: "new",
         args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
         timeout: 240000, // 4 minutes
+        protocolTimeout: 120000, // 2 minutes
       });
       const page = await browser.newPage();
       await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
@@ -17,12 +18,12 @@ async function obtenirStatsGolf(maxRetries = 3) {
 
       console.log(`Attempt ${attempt} to scrape Golf stats at ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })}`);
       await page.goto(url, { waitUntil: "load", timeout: 240000 });
-      await new Promise(resolve => setTimeout(resolve, 10000)); // Increased delay for dynamic content
+      await new Promise(resolve => setTimeout(resolve, 10000)); // Delay for dynamic content
       await page.click('#onetrust-accept-btn-handler', { timeout: 10000 }).catch(() => {}); // Accept cookies
-      await page.waitForSelector(".c-leaderboard tbody tr", { timeout: 240000 }); // Adjusted selector
+      await page.waitForSelector(".c-scoreboard__table tbody tr", { timeout: 240000 }); // Adjusted selector
 
       const data = await page.evaluate(() => {
-        const rows = Array.from(document.querySelectorAll(".c-leaderboard tbody tr"));
+        const rows = Array.from(document.querySelectorAll(".c-scoreboard__table tbody tr"));
         console.log(`Found ${rows.length} rows in the table`);
         const players = rows.map(row => {
           const cells = row.querySelectorAll("td");
