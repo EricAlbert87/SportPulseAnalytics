@@ -9,18 +9,18 @@ async function obtenirStatsGolf(maxRetries = 3) {
       browser = await puppeteer.launch({
         headless: "new",
         args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
-        timeout: 60000, // 1 minute for faster initial load
+        timeout: 90000, // 1.5 minutes
       });
       const page = await browser.newPage();
       await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
       await page.setViewport({ width: 1280, height: 800 });
 
       console.log(`Attempt ${attempt} to scrape Golf stats at ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })}`);
-      await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60000 });
-      await page.waitForSelector(".table-standings tbody tr", { timeout: 60000 }); // Updated selector based on common PGA structure
+      await page.goto(url, { waitUntil: "domcontentloaded", timeout: 90000 });
+      await page.waitForSelector(".leaderboard tbody tr", { timeout: 90000 }); // Updated selector
 
       const data = await page.evaluate(() => {
-        const rows = Array.from(document.querySelectorAll(".table-standings tbody tr"));
+        const rows = Array.from(document.querySelectorAll(".leaderboard tbody tr"));
         console.log(`Found ${rows.length} rows in the table`);
         const players = rows.map(row => {
           const cells = row.querySelectorAll("td");
@@ -43,7 +43,7 @@ async function obtenirStatsGolf(maxRetries = 3) {
     } catch (error) {
       console.error(`❌ Attempt ${attempt} failed: ${error.message}`);
       if (attempt === maxRetries) throw error;
-      await new Promise(resolve => setTimeout(resolve, 10000 * attempt)); // Reduced retry delay
+      await new Promise(resolve => setTimeout(resolve, 10000 * attempt));
     } finally {
       if (browser) await browser.close();
     }
