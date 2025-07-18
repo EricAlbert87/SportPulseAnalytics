@@ -14,7 +14,7 @@ async function obtenirStatsGolf(maxRetries = 3) {
           "--disable-dev-shm-usage",
           "--disable-blink-features=AutomationControlled",
         ],
-        executablePath: "/opt/homebrew/bin/chromium", // Update to the path from `which chromium`
+        executablePath: "/opt/homebrew/bin/chromium", // Direct path to Chromium binary
         timeout: 300000, // 5 minutes
         protocolTimeout: 240000, // 4 minutes
       });
