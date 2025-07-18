@@ -9,18 +9,19 @@ async function obtenirStatsGolf(maxRetries = 3) {
       browser = await puppeteer.launch({
         headless: "new",
         args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
-        timeout: 90000, // 1.5 minutes
+        timeout: 120000, // 2 minutes
       });
       const page = await browser.newPage();
       await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
       await page.setViewport({ width: 1280, height: 800 });
 
       console.log(`Attempt ${attempt} to scrape Golf stats at ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })}`);
-      await page.goto(url, { waitUntil: "domcontentloaded", timeout: 90000 });
-      await page.waitForSelector(".leaderboard tbody tr", { timeout: 90000 }); // Updated selector
+      await page.goto(url, { waitUntil: "domcontentloaded", timeout: 120000 });
+      await page.waitForTimeout(5000); // Allow time for dynamic content
+      await page.waitForSelector(".table-responsive tbody tr", { timeout: 120000 }); // Updated selector
 
       const data = await page.evaluate(() => {
-        const rows = Array.from(document.querySelectorAll(".leaderboard tbody tr"));
+        const rows = Array.from(document.querySelectorAll(".table-responsive tbody tr"));
         console.log(`Found ${rows.length} rows in the table`);
         const players = rows.map(row => {
           const cells = row.querySelectorAll("td");
