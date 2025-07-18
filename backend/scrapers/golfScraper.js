@@ -2,26 +2,26 @@ const puppeteer = require("puppeteer");
 
 async function obtenirStatsGolf(maxRetries = 3) {
   let browser;
-  const url = "https://www.pgatour.com/fedexcup/standings"; // Verify this URL
+  const url = "https://www.pgatour.com/fedexcup/standings";
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       browser = await puppeteer.launch({
         headless: "new",
         args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
-        timeout: 180000, // Increase to 3 minutes
+        timeout: 240000, // Increase to 4 minutes
       });
       const page = await browser.newPage();
       await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
-      await page.setViewport({ width: 1280, height: 800 }); // Ensure proper rendering
+      await page.setViewport({ width: 1280, height: 800 });
 
       console.log(`Attempt ${attempt} to scrape Golf stats at ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })}`);
-      await page.goto(url, { waitUntil: "domcontentloaded", timeout: 180000 }); // Wait for DOM
-      await page.waitForFunction(() => document.querySelector(".rankings-table") !== null, { timeout: 180000 }); // Wait for table
-      await page.waitForSelector(".rankings-table tbody tr", { timeout: 180000 }); // Verify selector
+      await page.goto(url, { waitUntil: "load", timeout: 240000 });
+      await page.waitForFunction(() => document.querySelector(".fedex-standings-table") !== null, { timeout: 240000 }); // Test new selector
+      await page.waitForSelector(".fedex-standings-table tbody tr", { timeout: 240000 });
 
       const data = await page.evaluate(() => {
-        const rows = Array.from(document.querySelectorAll(".rankings-table tbody tr"));
+        const rows = Array.from(document.querySelectorAll(".fedex-standings-table tbody tr"));
         console.log(`Found ${rows.length} rows in the table`);
         const players = rows.map(row => {
           const cells = row.querySelectorAll("td");
