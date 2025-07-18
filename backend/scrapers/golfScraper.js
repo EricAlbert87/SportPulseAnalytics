@@ -9,19 +9,19 @@ async function obtenirStatsGolf(maxRetries = 3) {
       browser = await puppeteer.launch({
         headless: "new",
         args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
-        timeout: 120000, // 2 minutes
+        timeout: 180000, // 3 minutes
       });
       const page = await browser.newPage();
       await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
       await page.setViewport({ width: 1280, height: 800 });
 
       console.log(`Attempt ${attempt} to scrape Golf stats at ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })}`);
-      await page.goto(url, { waitUntil: "domcontentloaded", timeout: 120000 });
-      await new Promise(resolve => setTimeout(resolve, 5000)); // Alternative delay method
-      await page.waitForSelector(".table-responsive tbody tr", { timeout: 120000 });
+      await page.goto(url, { waitUntil: "domcontentloaded", timeout: 180000 });
+      await new Promise(resolve => setTimeout(resolve, 5000)); // Delay for dynamic content
+      await page.waitForSelector(".standings-table tbody tr", { timeout: 180000 }); // Updated selector
 
       const data = await page.evaluate(() => {
-        const rows = Array.from(document.querySelectorAll(".table-responsive tbody tr"));
+        const rows = Array.from(document.querySelectorAll(".standings-table tbody tr"));
         console.log(`Found ${rows.length} rows in the table`);
         const players = rows.map(row => {
           const cells = row.querySelectorAll("td");
