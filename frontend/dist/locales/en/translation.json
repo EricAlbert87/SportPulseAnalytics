@@ -1,49 +1,24 @@
 {
-  "nav": {
-    "home": "Home",
-    "nhl": "NHL",
-    "golf": "Golf",
-    "tennis": "Tennis",
-    "nfl": "NFL"
-  },
-  "common": {
-    "loading": "Loading...",
-    "noData": "No data available.",
-    "points": "Points",
-    "goals": "Goals",
-    "assists": "Assists",
-    "rank": "Rank",
-    "player": "Player",
-    "team": "Team",
-    "year": "Year",
-    "stats": "Statistics",
-    "language": "Language"
-  },
-  "charts": {
-    "topScorers": "Top Scorers",
-    "pointsOverTime": "Points Over Time",
-    "goalsComparison": "Goals Comparison"
-  },
-  "pages": {
-    "welcomeMessage": "Welcome to SportPulse Analytics, your go-to dashboard for detailed sports statistics.",
-    "selectSport": "Select a sport from the navigation menu to explore player stats."
+  "app": {
+    "title": "SportPulse Analytics"
   },
   "dashboard": {
-    "tabs": {
-      "nhl": "NHL",
-      "nfl": "NFL",
-      "golf": "Golf",
-      "tennis": "Tennis"
-    },
-    "filters": {
-      "year": "Year",
-      "player": "Player",
-      "team": "Team",
-      "statCategory": "Stat Category",
-      "goals": "Goals",
-      "wins": "Wins",
-      "points": "Points",
-      "rank": "Rank"
-    }
+    "title": "Live Sports Statistics",
+    "tennis": "Tennis Rankings",
+    "golf": "Golf Standings",
+    "nhl": "NHL Skater Stats",
+    "nfl": "NFL Player Stats",
+    "rang": "Rank",
+    "nom": "Name",
+    "pays": "Country",
+    "evenements": "Events",
+    "points": "Points",
+    "gains": "Earnings",
+    "tournois": "Tournaments",
+    "equipe": "Team",
+    "matchs": "Games",
+    "buts": "Goals",
+    "yards": "Yards",
+    "touchdowns": "Touchdowns"
   }
 }

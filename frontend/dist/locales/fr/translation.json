@@ -1,50 +1,24 @@
 {
-  "nav": {
-    "home": "Accueil",
-    "nhl": "NHL",
-    "golf": "Golf",
-    "tennis": "Tennis",
-    "nfl": "NFL"
-  },
-  "common": {
-    "loading": "Chargement...",
-    "noData": "Aucune donnée disponible.",
-    "points": "Points",
-    "goals": "Buts",
-    "assists": "Passes",
-    "rank": "Rang",
-    "player": "Joueur",
-    "team": "Équipe",
-    "year": "Année",
-    "stats": "Statistiques",
-    "language": "Langue"
-  },
-  "charts": {
-    "topScorers": "Meilleurs marqueurs",
-    "pointsOverTime": "Points au fil du temps",
-    "goalsComparison": "Comparaison des buts"
-  },
-  "pages": {
-    "welcomeMessage": "Bienvenue sur SportPulse Analytics, votre tableau de bord pour des statistiques sportives détaillées.",
-    "selectSport": "Sélectionnez un sport dans le menu de navigation pour explorer les statistiques des joueurs."
+  "app": {
+    "title": "SportPulse Analytics"
   },
   "dashboard": {
-    "tabs": {
-      "nhl": "LNH",
-      "nfl": "NFL",
-      "golf": "Golf",
-      "tennis": "Tennis"
-    },
-    "filters": {
-      "year": "Année",
-      "player": "Joueur",
-      "team": "Équipe",
-      "statCategory": "Catégorie de statistique",
-      "goals": "Buts",
-      "wins": "Victoires",
-      "points": "Points",
-      "rank": "Classement"
-    }
+    "title": "Statistiques Sportives en Direct",
+    "tennis": "Classements Tennis",
+    "golf": "Classements Golf",
+    "nhl": "Statistiques Joueurs NHL",
+    "nfl": "Statistiques Joueurs NFL",
+    "rang": "Rang",
+    "nom": "Nom",
+    "pays": "Pays",
+    "evenements": "Événements",
+    "points": "Points",
+    "gains": "Gains",
+    "tournois": "Tournois",
+    "equipe": "Équipe",
+    "matchs": "Matchs",
+    "buts": "Buts",
+    "yards": "Yards",
+    "touchdowns": "Touchdowns"
   }
 }
-
