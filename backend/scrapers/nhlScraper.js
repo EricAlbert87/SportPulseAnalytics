@@ -8,17 +8,18 @@ async function obtenirStatsNHL(maxRetries = 3) {
     try {
       browser = await puppeteer.launch({
         headless: "new",
-        args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
-        timeout: 120000,
+        args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--disable-blink-features=AutomationControlled"],
+        timeout: 300000,
       });
       const page = await browser.newPage();
       await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
+      await page.setViewport({ width: 1280, height: 800 });
 
       console.log(`Attempt ${attempt} to scrape NHL stats at ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })}`);
-      await page.goto(url, { waitUntil: "networkidle2", timeout: 120000 });
-      await new Promise(resolve => setTimeout(resolve, 10000));
-      await page.click('#cookie-accept', { timeout: 10000 }).catch(() => {});
-      await page.waitForSelector(".statsTable tbody tr", { timeout: 120000 });
+      await page.goto(url, { waitUntil: "networkidle2", timeout: 300000 });
+      await new Promise(resolve => setTimeout(resolve, 20000));
+      await page.click('#onetrust-accept-btn-handler', { timeout: 20000 }).catch(() => {});
+      await page.waitForSelector(".statsTable tbody tr", { timeout: 300000 });
 
       const joueurs = await page.evaluate(() => {
         const rows = Array.from(document.querySelectorAll(".statsTable tbody tr"));
@@ -44,7 +45,7 @@ async function obtenirStatsNHL(maxRetries = 3) {
     } catch (error) {
       console.error(`❌ Attempt ${attempt} failed: ${error.message}`);
       if (attempt === maxRetries) throw error;
-      await new Promise(resolve => setTimeout(resolve, 15000 * attempt));
+      await new Promise(resolve => setTimeout(resolve, 30000 * attempt));
     } finally {
       if (browser) await browser.close();
     }
