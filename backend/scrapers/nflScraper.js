@@ -9,18 +9,19 @@ async function obtenirStatsNFL(maxRetries = 3) {
       browser = await puppeteer.launch({
         headless: "new",
         args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--disable-blink-features=AutomationControlled"],
-        timeout: 300000,
-        protocolTimeout: 300000, // Increased to match navigation timeout
+        timeout: 600000,
+        protocolTimeout: 600000,
       });
       const page = await browser.newPage();
       await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
       await page.setViewport({ width: 1280, height: 800 });
 
       console.log(`Attempt ${attempt} to scrape NFL stats at ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })}`);
-      await page.goto(url, { waitUntil: "networkidle2", timeout: 300000 });
-      await new Promise(resolve => setTimeout(resolve, 20000));
-      await page.click('#onetrust-accept-btn-handler', { timeout: 20000 }).catch(() => {});
-      await page.waitForSelector(".nfl-cst-table tbody tr", { timeout: 300000 });
+      await page.goto(url, { waitUntil: "networkidle2", timeout: 600000 });
+      await new Promise(resolve => setTimeout(resolve, Math.floor(Math.random() * 5000) + 20000)); // Random delay 20-25s
+      await page.click('#onetrust-accept-btn-handler', { timeout: 30000 }).catch(() => {});
+      await page.waitForFunction(() => document.readyState === 'complete', { timeout: 600000 });
+      await page.waitForSelector(".nfl-cst-table tbody tr", { timeout: 600000 });
 
       const joueurs = await page.evaluate(() => {
         const rows = Array.from(document.querySelectorAll(".nfl-cst-table tbody tr"));
