@@ -8,17 +8,23 @@ async function obtenirStatsNHL(maxRetries = 3) {
     try {
       browser = await puppeteer.launch({
         headless: "new",
-        args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--disable-blink-features=AutomationControlled"],
-        timeout: 180000,
+        args: [
+          "--no-sandbox",
+          "--disable-setuid-sandbox",
+          "--disable-dev-shm-usage",
+          "--disable-blink-features=AutomationControlled",
+        ],
+        timeout: 300000,
       });
       const page = await browser.newPage();
       await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
+      await page.setViewport({ width: 1280, height: 800 });
 
       console.log(`Attempt ${attempt} to scrape NHL stats at ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })}`);
-      await page.goto(url, { waitUntil: "load", timeout: 180000 });
-      await new Promise(resolve => setTimeout(resolve, 10000));
-      await page.click('#cookie-accept', { timeout: 10000 }).catch(() => {});
-      await page.waitForSelector(".stats-table tbody tr", { timeout: 180000 });
+      await page.goto(url, { waitUntil: "load", timeout: 300000 });
+      await new Promise(resolve => setTimeout(resolve, 15000));
+      await page.click('#onetrust-accept-btn-handler', { timeout: 15000 }).catch(() => {});
+      await page.waitForSelector(".stats-table tbody tr", { timeout: 300000 });
 
       const joueurs = await page.evaluate(() => {
         const rows = Array.from(document.querySelectorAll(".stats-table tbody tr"));
@@ -30,9 +36,9 @@ async function obtenirStatsNHL(maxRetries = 3) {
             rang: cells[0]?.innerText.trim() || "N/A",
             nom: cells[1]?.innerText.trim() || "N/A",
             equipe: cells[2]?.innerText.trim() || "N/A",
-            points: cells[3]?.innerText.trim().replace(/,/g, "") || "0",
-            matchs: cells[4]?.innerText.trim() || "0",
-            buts: cells[5]?.innerText.trim() || "0",
+            matchs: cells[3]?.innerText.trim() || "0",
+            buts: cells[4]?.innerText.trim() || "0",
+            points: cells[5]?.innerText.trim().replace(/,/g, "") || "0",
           };
         }).filter(player => player !== null);
         return players;
@@ -44,7 +50,7 @@ async function obtenirStatsNHL(maxRetries = 3) {
     } catch (error) {
       console.error(`❌ Attempt ${attempt} failed: ${error.message}`);
       if (attempt === maxRetries) throw error;
-      await new Promise(resolve => setTimeout(resolve, 15000 * attempt));
+      await new Promise(resolve => setTimeout(resolve, 20000 * attempt));
     } finally {
       if (browser) await browser.close();
     }

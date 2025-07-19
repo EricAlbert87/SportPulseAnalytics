@@ -16,16 +16,16 @@ function FootballPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await axios.get("/api/nfl");
+        const res = await axios.get("http://localhost:3001/nfl");
         const mapped = res.data.map((p) => ({
           rank: p.rang,
           name: p.nom,
           team: p.equipe,
-          position: p.position,
+          position: p.position || "N/A", // Add if scraper supports it
           gamesPlayed: p.matchs,
           yards: p.verges,
           touchdowns: p.tds,
-          interceptions: p.interceptions,
+          interceptions: p.interceptions || "0", // Add if scraper supports it
         }));
         setPlayers(mapped);
         setFilteredPlayers(mapped);
