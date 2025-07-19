@@ -8,26 +8,24 @@ async function obtenirStatsGolf(maxRetries = 3) {
     try {
       browser = await puppeteer.launch({
         headless: "new",
-        args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
-        timeout: 120000,
+        args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--disable-blink-features=AutomationControlled"],
+        timeout: 180000,
       });
       const page = await browser.newPage();
       await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
 
       console.log(`Attempt ${attempt} to scrape Golf stats at ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })}`);
-      await page.goto(url, { waitUntil: "networkidle2", timeout: 120000 });
+      await page.goto(url, { waitUntil: "load", timeout: 180000 });
+      await new Promise(resolve => setTimeout(resolve, 10000));
       await page.click('#cookie-accept', { timeout: 10000 }).catch(() => {});
-      await page.waitForSelector(".standings-table tbody tr", { timeout: 120000 });
+      await page.waitForSelector(".standings-table tbody tr", { timeout: 180000 });
 
       const joueurs = await page.evaluate(() => {
         const rows = Array.from(document.querySelectorAll(".standings-table tbody tr"));
         console.log(`Found ${rows.length} rows in the table`);
         const players = rows.map(row => {
           const cells = row.querySelectorAll("td");
-          if (cells.length < 6) {
-            console.log("Skipping row with insufficient cells:", cells.length);
-            return null;
-          }
+          if (cells.length < 6) return null;
           return {
             rang: cells[0]?.innerText.trim() || "N/A",
             nom: cells[1]?.innerText.trim() || "N/A",
@@ -37,7 +35,6 @@ async function obtenirStatsGolf(maxRetries = 3) {
             gains: cells[5]?.innerText.trim().replace(/,/g, "") || "0",
           };
         }).filter(player => player !== null);
-        console.log(`Sample player: ${players[0]?.nom} (${players[0]?.pays})`);
         return players;
       });
 
