@@ -13,23 +13,26 @@ async function obtenirStatsGolf(maxRetries = 3) {
           "--disable-setuid-sandbox",
           "--disable-dev-shm-usage",
           "--disable-blink-features=AutomationControlled",
+          "--disable-extensions",
+          "--disable-infobars",
         ],
-        timeout: 300000, // 5 minutes
+        timeout: 600000, // 10 minutes
+        protocolTimeout: 600000,
       });
       const page = await browser.newPage();
       await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
       await page.setViewport({ width: 1280, height: 800 });
 
       console.log(`Attempt ${attempt} to scrape Golf stats at ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })}`);
-      await page.goto(url, { waitUntil: "load", timeout: 300000 });
-      await new Promise(resolve => setTimeout(resolve, 15000)); // Increased delay
-      await page.click('#onetrust-accept-btn-handler', { timeout: 15000 }).catch(() => {});
-      await page.waitForSelector(".table-leaderboard tbody tr", { timeout: 300000 }); // Updated selector
+      await page.goto(url, { waitUntil: "domcontentloaded", timeout: 600000 });
+      await new Promise(resolve => setTimeout(resolve, 20000)); // 20-second delay
+      await page.click('#onetrust-accept-btn-handler', { timeout: 20000 }).catch(() => {});
+      await page.waitForFunction(() => document.querySelector(".table-leaderboard tbody tr") !== null, { timeout: 600000 });
 
       const joueurs = await page.evaluate(() => {
         const rows = Array.from(document.querySelectorAll(".table-leaderboard tbody tr"));
         console.log(`Found ${rows.length} rows in the table`);
-        const players = rows.map(row => {
+        return rows.map(row => {
           const cells = row.querySelectorAll("td");
           if (cells.length < 6) return null;
           return {
@@ -41,7 +44,6 @@ async function obtenirStatsGolf(maxRetries = 3) {
             gains: cells[5]?.innerText.trim().replace(/,/g, "") || "0",
           };
         }).filter(player => player !== null);
-        return players;
       });
 
       if (joueurs.length === 0) throw new Error("No valid player data extracted after processing rows");
@@ -50,7 +52,7 @@ async function obtenirStatsGolf(maxRetries = 3) {
     } catch (error) {
       console.error(`❌ Attempt ${attempt} failed: ${error.message}`);
       if (attempt === maxRetries) throw error;
-      await new Promise(resolve => setTimeout(resolve, 20000 * attempt));
+      await new Promise(resolve => setTimeout(resolve, 30000 * attempt));
     } finally {
       if (browser) await browser.close();
     }

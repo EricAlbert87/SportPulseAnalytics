@@ -13,23 +13,26 @@ async function obtenirStatsNHL(maxRetries = 3) {
           "--disable-setuid-sandbox",
           "--disable-dev-shm-usage",
           "--disable-blink-features=AutomationControlled",
+          "--disable-extensions",
+          "--disable-infobars",
         ],
-        timeout: 300000,
+        timeout: 600000,
+        protocolTimeout: 600000,
       });
       const page = await browser.newPage();
       await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
       await page.setViewport({ width: 1280, height: 800 });
 
       console.log(`Attempt ${attempt} to scrape NHL stats at ${new Date().toLocaleString("en-US", { timeZone: "America/New_York" })}`);
-      await page.goto(url, { waitUntil: "load", timeout: 300000 });
-      await new Promise(resolve => setTimeout(resolve, 15000));
-      await page.click('#onetrust-accept-btn-handler', { timeout: 15000 }).catch(() => {});
-      await page.waitForSelector(".stats-table tbody tr", { timeout: 300000 });
+      await page.goto(url, { waitUntil: "domcontentloaded", timeout: 600000 });
+      await new Promise(resolve => setTimeout(resolve, 20000));
+      await page.click('#onetrust-accept-btn-handler', { timeout: 20000 }).catch(() => {});
+      await page.waitForFunction(() => document.querySelector(".statsTable tbody tr") !== null, { timeout: 600000 }); // Updated selector
 
       const joueurs = await page.evaluate(() => {
-        const rows = Array.from(document.querySelectorAll(".stats-table tbody tr"));
+        const rows = Array.from(document.querySelectorAll(".statsTable tbody tr"));
         console.log(`Found ${rows.length} rows in the table`);
-        const players = rows.map(row => {
+        return rows.map(row => {
           const cells = row.querySelectorAll("td");
           if (cells.length < 6) return null;
           return {
@@ -41,7 +44,6 @@ async function obtenirStatsNHL(maxRetries = 3) {
             points: cells[5]?.innerText.trim().replace(/,/g, "") || "0",
           };
         }).filter(player => player !== null);
-        return players;
       });
 
       if (joueurs.length === 0) throw new Error("No valid player data extracted after processing rows");
@@ -50,7 +52,7 @@ async function obtenirStatsNHL(maxRetries = 3) {
     } catch (error) {
       console.error(`❌ Attempt ${attempt} failed: ${error.message}`);
       if (attempt === maxRetries) throw error;
-      await new Promise(resolve => setTimeout(resolve, 20000 * attempt));
+      await new Promise(resolve => setTimeout(resolve, 30000 * attempt));
     } finally {
       if (browser) await browser.close();
     }
