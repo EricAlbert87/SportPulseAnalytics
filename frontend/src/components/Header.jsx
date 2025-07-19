@@ -1,14 +1,30 @@
+import { useTranslation } from 'react-i18next';
+
 function Header() {
+  const { t, i18n } = useTranslation();
+
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+  };
+
   return (
-    <header className="bg-navy-900 text-white p-6 shadow-lg">
+    <header className="bg-navy-900 text-white p-4">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
-        <h1 className="text-3xl font-bold font-roboto">SportPulse Analytics</h1>
-        <nav className="space-x-6">
-          <a href="#nhl" className="hover:text-gold-500 transition duration-300 font-open-sans text-lg">NHL</a>
-          <a href="#nfl" className="hover:text-gold-500 transition duration-300 font-open-sans text-lg">NFL</a>
-          <a href="#golf" className="hover:text-gold-500 transition duration-300 font-open-sans text-lg">Golf</a>
-          <a href="#tennis" className="hover:text-gold-500 transition duration-300 font-open-sans text-lg">Tennis</a>
-        </nav>
+        <h1 className="text-2xl font-bold">{t('app.title')}</h1>
+        <div>
+          <button
+            onClick={() => changeLanguage('en')}
+            className="mr-2 hover:text-gold-500"
+          >
+            EN
+          </button>
+          <button
+            onClick={() => changeLanguage('fr')}
+            className="hover:text-gold-500"
+          >
+            FR
+          </button>
+        </div>
       </div>
     </header>
   );
