@@ -10,6 +10,7 @@ async function obtenirStatsGolf(maxRetries = 3) {
         headless: "new",
         args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--disable-blink-features=AutomationControlled"],
         timeout: 300000,
+        protocolTimeout: 300000, // Increased to match navigation timeout
       });
       const page = await browser.newPage();
       await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
