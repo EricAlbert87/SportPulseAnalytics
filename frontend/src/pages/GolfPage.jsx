@@ -15,7 +15,7 @@ function GolfPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await axios.get("/api/golf");
+        const res = await axios.get("http://localhost:3001/golf");
         const mapped = res.data.map((p) => ({
           rank: p.rang,
           name: p.nom,

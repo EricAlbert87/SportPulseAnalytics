@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { fetchStats } from "../api/fetchStats";
+import axios from "axios";
 import StatTable from "../components/ui/StatTable";
 import BarChartCustom from "../components/charts/BarChartCustom";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
@@ -17,20 +17,24 @@ function HockeyPage() {
   useEffect(() => {
     async function fetchData() {
       setIsLoading(true);
-      const data = await fetchStats("nhl");
-      const mapped = data.map((p) => ({
-        rank: p.rang,
-        name: p.nom,
-        team: p.equipe,
-        gamesPlayed: p.matchs,
-        goals: p.buts,
-        assists: p.aides,
-        points: p.points,
-        plusMinus: p.pm,
-      }));
-      setPlayers(mapped);
-      setFilteredPlayers(mapped);
-      setIsLoading(false);
+      try {
+        const res = await axios.get("http://localhost:3001/nhl");
+        const mapped = res.data.map((p) => ({
+          rank: p.rang,
+          name: p.nom,
+          team: p.equipe,
+          gamesPlayed: p.matchs,
+          goals: p.buts,
+          points: p.points,
+          plusMinus: "N/A", // Not in scraper, add if available
+        }));
+        setPlayers(mapped);
+        setFilteredPlayers(mapped);
+      } catch (error) {
+        console.error("Error loading NHL data:", error);
+      } finally {
+        setIsLoading(false);
+      }
     }
     fetchData();
   }, [season]);
@@ -56,7 +60,6 @@ function HockeyPage() {
     { key: "team", label: t("common.team") },
     { key: "gamesPlayed", label: t("common.gamesPlayed") },
     { key: "goals", label: t("common.goals") },
-    { key: "assists", label: t("common.assists") },
     { key: "points", label: t("common.points") },
     { key: "plusMinus", label: "+/-" },
   ];
